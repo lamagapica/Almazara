@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESTACIÓN I: LA ALMAZARA · Yacimiento Arqueológico de Vareia</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Pannellum 360° -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+
+    <style>
+:root {
+  --bg: #1a1110;
+  --bg2: #2d1d1c;
+  --ink: #1a100a;
+  --gold: #c5a059;
+  --gold-light: #e5d3b3;
+  --mint: #3e6b52;
+  --terracotta: #9e472a;
+  --card: #f9f7f2;
+  --txt: #2b2625;
+  --border: rgba(197, 160, 89, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; /* Base legibilidad móvil */
+}
+
+body {
+  font-family: 'Lora', serif;
+  color: #fff;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 0, var(--bg2), var(--bg) 70%) fixed;
+  padding: 12px 10px 30px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+main {
+  width: 100%;
+  max-width: 480px; /* Ancho optimizado para smartphones */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+h1, h2, .chip, .btn, .tab {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+.card {
+  background: var(--card);
+  color: var(--txt);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  padding: 14px;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip {
+  background: var(--bg2);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chip.m {
+  background: var(--mint);
+  color: #fff;
+  border-color: var(--mint);
+}
+
+h1 {
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.node {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  opacity: 0.5;
+  color: var(--gold);
+}
+
+.node.on {
+  background: var(--mint);
+  opacity: 1;
+  border-color: #fff;
+  color: #fff;
+}
+
+.node.now {
+  background: var(--terracotta);
+  opacity: 1;
+  border-color: var(--gold-light);
+  box-shadow: 0 0 8px rgba(197, 160, 89, 0.5);
+}
+
+.bar {
+  flex: 1;
+  max-width: 100px;
+  height: 4px;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #e8e3d8;
+  border: 1px solid #d0c7b5;
+  border-radius: 6px;
+  padding: 3px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.tabs::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  background: var(--terracotta);
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.tabs[data-t="1"]::before {
+  transform: translateX(100%);
+}
+
+.tab {
+  position: relative;
+  background: none;
+  border: 0;
+  padding: 12px 4px; /* Mayor superficie táctil */
+  font-size: 0.72rem;
+  cursor: pointer;
+  color: var(--txt);
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.tab[aria-selected="true"] {
+  color: #fff;
+}
+
+.view {
+  display: none;
+}
+
+.view.on {
+  display: block;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 280px; /* Proporción cómoda para pantallas verticales */
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+  touch-action: pan-y;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+#after {
+  clip-path: inset(0 0 0 50%);
+}
+
+.tag {
+  position: absolute;
+  top: 8px;
+  padding: 3px 6px;
+  border: 1px solid var(--gold);
+  font: 700 0.65rem 'Cinzel', serif;
+  background: rgba(26, 17, 16, 0.85);
+  color: var(--gold-light);
+  z-index: 3;
+}
+
+.knob {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: var(--gold);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.knob b {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--gold);
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  font-size: 0.7rem;
+}
+
+#rng {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: ew-resize;
+  z-index: 4;
+}
+
+#panorama {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.hint {
+  text-align: center;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  color: #665e57;
+  font-style: italic;
+}
+
+.mission h2 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+  color: var(--terracotta);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+
+.mission p {
+  line-height: 1.5;
+  margin-bottom: 10px;
+  font-size: 0.95rem; /* Texto de lectura fluido sin zoom */
+  color: #3d3533;
+}
+
+.q {
+  background: #f0ebe1;
+  border-left: 3px solid var(--terracotta);
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.ans {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+input.big {
+  width: 70px;
+  font: 700 1.4rem 'Cinzel', serif;
+  text-align: center;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  padding: 8px;
+  background: #fff;
+}
+
+.btn {
+  flex: 1;
+  background: var(--terracotta);
+  color: #fff;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.msg {
+  min-height: 1.2em;
+  margin-top: 8px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--terracotta);
+  font-size: 0.85rem;
+}
+
+.win {
+  display: none;
+  text-align: center;
+}
+
+.win.on {
+  display: block;
+}
+
+.key {
+  font: 800 3.8rem/1 'Cinzel', serif;
+  color: var(--terracotta);
+  margin: 6px 0;
+}
+
+.clue {
+  background: #f0ebe1;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.msg.ok {
+  color: var(--mint);
+}
+
+.pano-error {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 16px;
+  text-align: center;
+  color: var(--gold-light);
+  font-size: 0.85rem;
+}
+
+</style>
+</head>
+<body>
+    <main>
+        <header>
+            <div class="top">
+                <span class="chip">SECTOR I · LA ALMAZARA</span>
+                <span class="chip m" id="trophies">REGISTROS 0/3</span>
+            </div>
+            <h1>LA ALMAZARA</h1>
+            <div class="path" aria-label="Progreso de la misión">
+                <span class="node now">I</span>
+                <span class="node">II</span>
+                <span class="node">III</span>
+                <div class="bar"><i id="fill" style="width:0%"></i></div>
+                <span class="node">IV</span>
+            </div>
+        </header>
+
+        <section class="card" aria-label="Visores">
+            <div class="tabs" data-t="0" role="tablist">
+                <button class="tab" id="tab0" role="tab" aria-selected="true" onclick="switchTab(0)">RECONSTRUCCIÓN</button>
+                <button class="tab" id="tab1" role="tab" aria-selected="false" onclick="switchTab(1)">PANORÁMICA 360°</button>
+            </div>
+            
+            <div class="view on" id="view0">
+                <div class="stage">
+                    <div class="layer" style="background-image:url('almazara-antes.jpg')"></div>
+                    <div class="layer" id="after" style="background-image:url('almazara-ahora.jpg')"></div>
+                    <span class="tag" style="left:8px">ORIGINAL</span>
+                    <span class="tag" style="right:8px; background:var(--mint); border-color:var(--mint)">ACTUALIDAD</span>
+                    <div class="knob" id="knob"><b>◀ ▶</b></div>
+                    <input id="rng" type="range" min="0" max="100" value="50" aria-label="Comparar antes y ahora">
+                </div>
+                <p class="hint">Deslice el control para alternar entre el estado arqueológico original y el actual.</p>
+            </div>
+
+            <div class="view" id="view1">
+                <div class="stage">
+                    <div id="panorama"></div>
+                    <span class="tag" style="left:8px; z-index: 10;">PERSPECTIVA 360°</span>
+                </div>
+                <p class="hint">Arrastre con el dedo en cualquier dirección para rotar la panorámica 360°.</p>
+            </div>
+        </section>
+
+        <section class="card mission">
+            <h2>DOCUMENTACIÓN DEL REGISTRO</h2>
+            <p>En la antigua Vareia, la agricultura y el comercio fluvial a través del río Ebro impulsaron la producción de aceite de oliva. La almazara constituía la unidad de procesamiento donde se molían las aceitunas mediante molinos de piedra (<i>mola olearia</i>) para extraer el aceite. Una vez procesado, el producto se conservaba en <b>2 tipos de vasijas de barro</b> principales clasificadas por su capacidad, destinadas a la exportación por el Imperio o al suministro de las tropas romanas.</p>
+            <div class="q">¿En cuántos tipos de vasijas de barro principales según su tamaño se conservaba el aceite en Vareia?</div>
+            <div id="form">
+                <div class="ans">
+                    <input class="big" id="ans" inputmode="numeric" maxlength="2" placeholder="—" aria-label="Tu respuesta">
+                    <button class="btn" id="go">VALIDAR REGISTRO</button>
+                </div>
+                <p class="msg" id="msg" aria-live="polite"></p>
+            </div>
+        </section>
+
+        <section class="card win" id="winCard" aria-live="polite">
+            <h2 class="chip" style="display:inline-block">REGISTRO VERIFICADO</h2>
+            <div class="key">2</div>
+            <p style="font-weight:600">Código parcial obtenido. Conserve este valor numérico para la resolución final.</p>
+            <div class="clue">Siguiente coordenada: Diríjase hacia las inmediaciones de los antiguos baños públicos para hallar el registro de Las Termas.</div>
+        </section>
+    </main>
+
+    <script>
+(function () {
+  'use strict';
+
+  // ====== CONFIGURACIÓN ======
+  var RESPUESTA_CORRECTA = '2';
+  var IMAGEN_360 = 'almazara-360.jpg'; // <-- pon aquí el nombre de tu panorámica equirectangular
+
+  var tabs = document.querySelector('.tabs');
+  var rng = document.getElementById('rng');
+  var after = document.getElementById('after');
+  var knob = document.getElementById('knob');
+  var ans = document.getElementById('ans');
+  var go = document.getElementById('go');
+  var msg = document.getElementById('msg');
+  var winCard = document.getElementById('winCard');
+  var trophies = document.getElementById('trophies');
+  var fill = document.getElementById('fill');
+  var viewer = null;
+
+  // ====== PESTAÑAS ======
+  window.switchTab = function (n) {
+    tabs.setAttribute('data-t', n);
+    for (var i = 0; i < 2; i++) {
+      document.getElementById('tab' + i).setAttribute('aria-selected', i === n ? 'true' : 'false');
+      document.getElementById('view' + i).classList.toggle('on', i === n);
+    }
+    if (n === 1) initPanorama();
+  };
+
+  // ====== PANORÁMICA 360° ======
+  function initPanorama() {
+    if (viewer) {
+      viewer.resize();
+      return;
+    }
+    if (typeof pannellum === 'undefined') {
+      showPanoError('No se pudo cargar el visor 360°. Revise la conexión.');
+      return;
+    }
+    try {
+      viewer = pannellum.viewer('panorama', {
+        type: 'equirectangular',
+        panorama: IMAGEN_360,
+        autoLoad: true,
+        showControls: true,
+        compass: false,
+        hfov: 100,
+        minHfov: 50,
+        maxHfov: 120,
+        mouseZoom: false,
+        touchPanSpeedCoeffFactor: 1,
+        strings: { loadButtonLabel: 'Pulse para cargar', loadingLabel: 'Cargando...' }
+      });
+      viewer.on('error', function () {
+        showPanoError('No se encontró la imagen 360° (' + IMAGEN_360 + ').');
+      });
+    } catch (e) {
+      showPanoError('Error al iniciar la panorámica 360°.');
+    }
+  }
+
+  function showPanoError(text) {
+    var el = document.getElementById('panorama');
+    el.innerHTML = '<div class="pano-error">' + text + '</div>';
+    viewer = null;
+  }
+
+  // ====== COMPARADOR ANTES / AHORA ======
+  function updateSlider() {
+    var v = rng.value;
+    after.style.clipPath = 'inset(0 0 0 ' + v + '%)';
+    knob.style.left = v + '%';
+  }
+  rng.addEventListener('input', updateSlider);
+  updateSlider();
+
+  // ====== VALIDACIÓN ======
+  function validar() {
+    var val = ans.value.trim();
+    if (val === '') {
+      msg.className = 'msg';
+      msg.textContent = 'Introduzca un número.';
+      return;
+    }
+    if (val === RESPUESTA_CORRECTA) {
+      msg.className = 'msg ok';
+      msg.textContent = 'Registro correcto.';
+      winCard.classList.add('on');
+      trophies.textContent = 'REGISTROS 1/3';
+      fill.style.width = '100%';
+      var nodes = document.querySelectorAll('.node');
+      nodes[0].classList.remove('now');
+      nodes[0].classList.add('on');
+      ans.disabled = true;
+      go.disabled = true;
+      go.style.opacity = '.6';
+      setTimeout(function () {
+        winCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+    } else {
+      msg.className = 'msg';
+      msg.textContent = 'Respuesta incorrecta. Revise la documentación e inténtelo de nuevo.';
+      ans.classList.remove('shake');
+      void ans.offsetWidth;
+      ans.classList.add('shake');
+      ans.select();
+    }
+  }
+
+  go.addEventListener('click', validar);
+  ans.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') validar();
+  });
+  ans.addEventListener('input', function () {
+    ans.value = ans.value.replace(/\D/g, '');
+  });
+})();
+
+</script>
+</body>
+</html>
