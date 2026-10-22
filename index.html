@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Secreto de Varia - Inicio y La Almazara</title>
-    <!-- Tailwind CSS -->
+    <title>El Secreto de Varia - Inicio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Marcellus&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script>
         tailwind.config = {
             theme: {
@@ -23,7 +19,6 @@
                         miel: '#C57938',
                         vainilla: '#E7C196',
                         'cafe-dark': '#26160d',
-                        'caramelo-dark': '#4a2611',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -34,20 +29,17 @@
             }
         }
     </script>
-
     <style>
         body {
             background-color: #26160d;
             color: #382417;
             font-family: 'Inter', sans-serif;
             background-image: radial-gradient(circle at 50% 50%, rgba(231, 193, 150, 0.15) 0%, rgba(38, 22, 13, 0.95) 100%);
-            background-attachment: fixed;
             min-height: 100vh;
         }
         .parchment-sheet {
             background-color: #E7C196;
             background-image: radial-gradient(circle at 50% 0%, rgba(255, 245, 225, 0.75) 0%, rgba(231, 193, 150, 0.95) 100%);
-            color: #382417;
             border-top: 4px solid #C57938;
             border-bottom: 4px solid #6D3C1C;
         }
@@ -60,136 +52,88 @@
             outline: 1px solid #6D3C1C;
             outline-offset: -5px;
         }
-        .slider-container { position: relative; overflow: hidden; touch-action: pan-y; }
-        .slider-img-after { position: absolute; top: 0; left: 0; height: 100%; width: 50%; overflow: hidden; border-right: 3px solid #C57938; }
     </style>
 </head>
 <body class="flex flex-col justify-between min-h-screen">
 
-    <header class="relative z-20 bg-cafe-dark border-b-2 border-miel px-4 md:px-8 py-4 text-vainilla">
-        <div class="max-w-6xl mx-auto flex justify-between items-center flex-wrap gap-2">
+    <header class="bg-cafe-dark border-b-2 border-miel px-4 py-4 text-vainilla">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 border border-miel flex items-center justify-center bg-caramelo-dark text-miel font-cinzel font-bold text-lg">IV</div>
+                <div class="w-10 h-10 border border-miel flex items-center justify-center bg-caramelo text-miel font-cinzel font-bold text-lg">IV</div>
                 <div>
-                    <h1 class="font-cinzel text-base md:text-xl font-bold tracking-widest uppercase text-vainilla">El Secreto de Varia</h1>
-                    <p class="text-[11px] font-roman text-miel tracking-wider">Escape Room Arqueológico • Varea (Logroño)</p>
+                    <h1 class="font-cinzel text-base md:text-xl font-bold tracking-widest uppercase">El Secreto de Varia</h1>
+                    <p class="text-[11px] font-roman text-miel">Escape Room Arqueológico • Varea (Logroño)</p>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="relative z-10 flex-grow max-w-5xl w-full mx-auto my-4 md:my-8 px-4">
+    <main class="flex-grow max-w-4xl w-full mx-auto my-8 px-4">
         <div class="parchment-sheet roman-border-box p-6 md:p-12 space-y-8 shadow-2xl">
-            
-            <!-- STAGE 1: INICIO Y REGISTRO -->
-            <section id="stage-intro" class="space-y-8">
-                <div class="text-center space-y-3">
-                    <span class="font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest block">
-                        MISIÓN ARQUEOLÓGICA HÍBRIDA EN VAREA • LEGIO IV MACEDONICA
-                    </span>
-                    <h2 class="font-cinzel text-3xl md:text-5xl font-black text-cafe tracking-wide uppercase">El Tesoro de Uara</h2>
-                    <div class="roman-divider max-w-md mx-auto"></div>
-                </div>
+            <div class="text-center space-y-3">
+                <span class="font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest block">MISIÓN ARQUEOLÓGICA • LEGIO IV MACEDONICA</span>
+                <h2 class="font-cinzel text-3xl md:text-5xl font-black text-cafe uppercase">El Tesoro de Uara</h2>
+                <div class="roman-divider max-w-md mx-auto"></div>
+            </div>
 
-                <div class="space-y-4 text-sm md:text-base text-cafe leading-relaxed font-sans text-justify md:text-center max-w-3xl mx-auto">
-                    <p class="text-lg font-roman text-caramelo font-semibold">«Mi nombre es Petra y soy una joven romana de Vareia. ¡Tenemos una misión urgente!»</p>
-                    <p>Bienvenido a Vareia. Estás pisando el suelo donde hace dos mil años la Legio IV Macedonica levantó su campamento militar. Recupera el Tesoro superando las 4 estaciones.</p>
-                </div>
+            <div class="space-y-4 text-sm md:text-base text-cafe leading-relaxed text-justify md:text-center max-w-2xl mx-auto">
+                <p class="text-lg font-roman text-caramelo font-semibold">«Mi nombre es Petra y soy una joven romana de Vareia. ¡Tenemos una misión urgente!»</p>
+                <p>Estás pisando el suelo donde hace dos mil años la Legio IV Macedonica levantó su campamento militar. Viaja en el tiempo para recuperar el Tesoro de Uara, oculto tras la marcha de las legiones romanas.</p>
+                <p>Supera las 4 estaciones para conseguir las cifras del candado imperial.</p>
+            </div>
 
-                <div class="max-w-xl mx-auto space-y-6 pt-4">
-                    <div class="space-y-3">
-                        <label class="block font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest text-center">Elige tu Nivel de Dificultad:</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div id="card-diff-easy" onclick="selectDifficulty('easy')" class="cursor-pointer border-2 border-caramelo p-4 bg-vainilla transition text-left relative">
-                                <span class="font-cinzel font-bold text-sm text-cafe">Versión Fácil</span>
-                                <p class="text-xs text-cafe/80">Preguntas con opciones (A, B, C).</p>
-                            </div>
-                            <div id="card-diff-hard" onclick="selectDifficulty('hard')" class="cursor-pointer border-2 border-caramelo/40 p-4 bg-vainilla/50 transition text-left relative">
-                                <span class="font-cinzel font-bold text-sm text-cafe">Versión Difícil</span>
-                                <p class="text-xs text-cafe/80">Escribe la respuesta tú mismo.</p>
-                            </div>
+            <div class="max-w-xl mx-auto space-y-6 pt-4">
+                <div class="space-y-3">
+                    <label class="block font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest text-center">Nivel de Dificultad:</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div id="card-easy" onclick="setDiff('easy')" class="cursor-pointer border-2 border-caramelo p-4 bg-vainilla text-left relative shadow-md">
+                            <span class="font-cinzel font-bold text-sm text-cafe block"><i class="fa-solid fa-child text-miel"></i> Versión Fácil</span>
+                            <p class="text-xs text-cafe/80">Preguntas con opciones (A, B, C) extraídas del texto.</p>
+                        </div>
+                        <div id="card-hard" onclick="setDiff('hard')" class="cursor-pointer border-2 border-caramelo/40 p-4 bg-vainilla/50 text-left relative opacity-70">
+                            <span class="font-cinzel font-bold text-sm text-cafe block"><i class="fa-solid fa-brain text-miel"></i> Versión Difícil</span>
+                            <p class="text-xs text-cafe/80">Preguntas de cultura general e historia romana.</p>
                         </div>
                     </div>
-
-                    <div class="space-y-2 text-center">
-                        <label for="player-name-input" class="block font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest">Nombre del Explorador:</label>
-                        <input type="text" id="player-name-input" placeholder="Escribe tu nombre..." class="w-full bg-vainilla border-2 border-caramelo px-4 py-3 text-cafe font-bold text-center text-lg focus:outline-none">
-                    </div>
-
-                    <button onclick="startGame()" class="w-full py-4 bg-caramelo text-vainilla font-cinzel font-bold text-sm uppercase hover:bg-cafe transition">
-                        Iniciar Misión (Ir a La Almazara)
-                    </button>
-                </div>
-            </section>
-
-            <!-- STAGE 2: LA ALMAZARA -->
-            <section id="stage-almazara" class="hidden space-y-8">
-                <div class="flex justify-between items-center border-b border-caramelo/30 pb-4 font-cinzel text-xs">
-                    <span class="text-cafe font-bold border-b-2 border-caramelo pb-1">1. Almazara</span>
-                    <span class="text-caramelo/40">&rarr; 2. Termas &rarr; 3. Artesanos &rarr; 4. Campamento</span>
                 </div>
 
-                <div>
-                    <span class="font-cinzel text-xs font-bold uppercase text-caramelo tracking-widest">Estación I de IV</span>
-                    <h2 class="font-cinzel text-2xl md:text-4xl font-black text-cafe uppercase mt-1">La Almazara Romana</h2>
+                <div class="space-y-2 text-center">
+                    <label for="player-name" class="block font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest">Inscribe tu Nombre:</label>
+                    <input type="text" id="player-name" placeholder="Escribe tu nombre..." class="w-full bg-vainilla border-2 border-caramelo px-4 py-3 text-cafe font-bold text-center text-lg focus:outline-none">
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    <div class="lg:col-span-7">
-                        <div class="relative border-2 border-caramelo h-72 bg-cafe/20">
-                            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80" alt="Varea Actual" class="w-full h-full object-cover">
-                            <div class="slider-img-after" id="slider-overlay">
-                                <img src="https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80" alt="Varia Romana" class="absolute top-0 left-0 max-w-none h-full object-cover">
-                            </div>
-                            <input type="range" min="0" max="100" value="50" oninput="document.getElementById('slider-overlay').style.width=this.value+'%'" class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize">
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-5 space-y-6">
-                        <div class="border-l-4 border-caramelo pl-4">
-                            <h3 class="font-cinzel text-xs uppercase text-caramelo font-bold">Relato de Petra:</h3>
-                            <p class="text-xs text-cafe italic">«¡Hola! Bienvenidos a la antigua Almazara[cite: 1]. Aquí prensábamos las aceitunas recolectadas junto al Ebro para obtener el aceite de Varia[cite: 1]».</p>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h4 class="font-cinzel text-xs uppercase text-caramelo font-bold">Desafío del Códice:</h4>
-                            <p class="text-xs text-cafe font-semibold">¿Qué valioso líquido dorado prensaban los romanos en la Almazara?</p>
-                            <button onclick="checkAnswer(true)" class="w-full py-2 px-3 text-left text-xs bg-vainilla border border-caramelo hover:bg-miel/20">A) El aceite de oliva virgen de Varia</button>
-                            <button onclick="checkAnswer(false)" class="w-full py-2 px-3 text-left text-xs bg-vainilla border border-caramelo hover:bg-miel/20">B) Jarabe de miel y moras</button>
-                        </div>
-                        <div id="feedback" class="hidden text-xs font-bold text-caramelo">¡Correcto! Cifra obtenida: <strong>7 (VII)</strong>[cite: 1]</div>
-                    </div>
-                </div>
-
-                <div class="pt-6 border-t border-caramelo/30 flex justify-between items-center">
-                    <span class="text-xs font-cinzel text-caramelo font-bold">Cifra 1: <strong id="digit-display">?</strong></span>
-                    <a id="next-btn" href="termas.html" class="px-6 py-3 text-xs font-cinzel font-bold text-vainilla bg-caramelo hover:bg-cafe uppercase opacity-50 pointer-events-none">Siguiente Estación: Termas &rarr;</a>
-                </div>
-            </section>
+                <button onclick="initGame()" class="w-full py-4 bg-caramelo text-vainilla font-cinzel font-bold text-sm tracking-widest uppercase hover:bg-cafe transition border border-miel flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-compass text-miel"></i>
+                    <span>Iniciar Misión (Ir a la Almazara)</span>
+                </button>
+            </div>
         </div>
     </main>
 
+    <footer class="bg-cafe-dark border-t border-miel py-4 text-center text-xs text-miel font-cinzel">
+        Varia Romana Escape Room • Legio IV Macedonica
+    </footer>
+
     <script>
         let diff = 'easy';
-        function selectDifficulty(m) { diff = m; }
-        function startGame() {
-            const name = document.getElementById('player-name-input').value.trim();
-            if(!name) return alert('Ingresa tu nombre');
-            localStorage.setItem('player_name', name);
-            localStorage.setItem('difficulty', diff);
-            document.getElementById('stage-intro').classList.add('hidden');
-            document.getElementById('stage-almazara').classList.remove('hidden');
+        function setDiff(mode) {
+            diff = mode;
+            document.getElementById('card-easy').style.opacity = mode === 'easy' ? '1' : '0.6';
+            document.getElementById('card-hard').style.opacity = mode === 'hard' ? '1' : '0.6';
         }
-        function checkAnswer(correct) {
-            if(correct) {
-                document.getElementById('feedback').classList.remove('hidden');
-                document.getElementById('digit-display').innerText = '7';
-                localStorage.setItem('cifra_1', '7');
-                const btn = document.getElementById('next-btn');
-                btn.classList.remove('opacity-50', 'pointer-events-none');
-            } else {
-                alert('Respuesta incorrecta, vuelve a intentarlo.');
-            }
+        function initGame() {
+            const name = document.getElementById('player-name').value.trim();
+            if(!name) { alert("Inscribe tu nombre para iniciar."); return; }
+            
+            const gameState = {
+                playerName: name,
+                difficulty: diff,
+                startTime: Date.now(),
+                digits: [null, null, null, null],
+                completed: false
+            };
+            localStorage.setItem('vareia_game_state', JSON.stringify(gameState));
+            window.location.href = 'almazara.html';
         }
     </script>
 </body>
