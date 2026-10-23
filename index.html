@@ -421,9 +421,9 @@
                         </div>
                     </div>
 
-                    <button id="btn-next-station" onclick="advanceToNextStation()" disabled
+                    <button id="btn-next-station" onclick="advanceToNextStation()" disabled 
                             class="px-8 py-3 text-xs font-cinzel font-bold text-caramelo/40 border border-caramelo/30 uppercase tracking-widest transition cursor-not-allowed">
-                        Buscar la señal de la siguiente ubicación →
+                        Siguiente Estación &rarr;
                     </button>
                 </div>
 
@@ -624,7 +624,7 @@
                     <li><strong>Fácil (Niños de Primaria):</strong> Preguntas tipo test con la respuesta explícita en el texto.</li>
                     <li><strong>Difícil (Cultura General):</strong> Preguntas históricas abiertas donde deberás escribir la respuesta correcta.</li>
                 </ul>
-                <p><strong>2. Recorrido Arqueológico:</strong> En cada ubicación hay una señal de color. Pulsa «Buscar señal de color», apunta la cámara y mantenla quieta hasta que se llene la barra. No se puede saltar a la siguiente estación desde los botones.</p>
+                <p><strong>2. Recorrido Arqueológico:</strong> En cada ubicación hay una señal de color (verde, azul, naranja y rojo). Pulsa «Buscar señal de color», apunta la cámara y mantenla quieta hasta que se llene la barra. No se puede saltar a la siguiente estación desde los botones.</p>
                 <p><strong>3. Las 4 Estaciones:</strong> 1. Almazara &rarr; 2. Termas &rarr; 3. Calle Artesanos &rarr; 4. Campamento Romano.</p>
                 <p><strong>4. Arca Imperial:</strong> Convierte las 4 cifras obtenidas a números romanos (VII - III - IX - II) para abrir el criptex final.</p>
             </div>
@@ -636,7 +636,6 @@
     </div>
 
 
-    
     <!-- JAVASCRIPT GAME ENGINE -->
     <script>
         /* ==========================================================================
@@ -759,13 +758,13 @@
         // Global State Variables
         let playerName = "";
         let selectedDifficulty = "easy"; // "easy" or "hard"
-        let currentStationIndex = -1;
-        let collectedDigits = [null, null, null, null];
+        let currentStationIndex = -1; // -1 = aún no se ha detectado ninguna señal
         let camStream = null;
         let scanTimer = null;
         let scannerStarting = false;
         let holdFrames = 0;
         let lastDetected = null;
+        let collectedDigits = [null, null, null, null];
         let cryptexIndices = [0, 0, 0, 0]; // Index 0 = 'I'
         let audioActive = false;
         let audioCtx = null;
@@ -910,23 +909,32 @@
             document.getElementById('stage-intro').classList.add('hidden');
             document.getElementById('stage-game').classList.remove('hidden');
 
-            // Iniciar cronómetro; la primera estación solo se abre al detectar su color.
+            // Iniciar Cronómetro; la primera estación solo se abre al detectar su color.
             startTimer();
+            showLockedState();
+            playCoinSound();
+            openQRScannerModal();
+        }
+
+        // Pantalla de espera: nada de la estación se ve hasta detectar la señal
+        function showLockedState() {
             currentStationIndex = -1;
-            document.getElementById('station-title').innerText = 'Encuentra la señal del primer punto';
             document.getElementById('station-tag').innerText = 'Acceso pendiente';
+            document.getElementById('station-title').innerText = 'Encuentra la señal del primer punto';
             document.getElementById('station-location-badge').innerText = 'Busca la señal VERDE de La Almazara para comenzar';
-            document.getElementById('station-history-text').innerText = 'Petra te espera en el primer punto. Pulsa “Buscar señal de color” y enfoca con la cámara la señal colocada en la ubicación.';
+            document.getElementById('station-history-text').innerText = 'Petra te espera en el primer punto. Pulsa «Buscar señal de color» y enfoca con la cámara la señal colocada en la ubicación.';
             document.getElementById('station-question').innerText = 'La pregunta aparecerá cuando la cámara detecte la señal correcta.';
             document.getElementById('question-options-easy').innerHTML = '';
             document.getElementById('question-options-easy').classList.add('hidden');
             document.getElementById('question-input-hard').classList.add('hidden');
+            document.getElementById('question-feedback').classList.add('hidden');
+            document.getElementById('next-clue-box').classList.add('hidden');
             document.getElementById('riddle-box').classList.add('opacity-50');
-            document.getElementById('btn-next-station').disabled = true;
-            document.getElementById('btn-next-station').innerText = 'Busca la señal de inicio';
-            document.getElementById('btn-next-station').className = 'px-8 py-3 text-xs font-cinzel font-bold text-caramelo/40 border border-caramelo/30 uppercase tracking-widest cursor-not-allowed';
-            playCoinSound();
-            openQRScannerModal();
+            const nextBtn = document.getElementById('btn-next-station');
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = 'Busca la señal de inicio';
+            nextBtn.className = 'px-8 py-3 text-xs font-cinzel font-bold text-caramelo/40 border border-caramelo/30 uppercase tracking-widest cursor-not-allowed';
+            updateProgressStepper(-1);
         }
 
         function loadStation(index) {
@@ -983,6 +991,7 @@
 
             const nextBtn = document.getElementById('btn-next-station');
             nextBtn.disabled = true;
+            nextBtn.innerHTML = 'Siguiente Estación &rarr;';
             nextBtn.className = "px-8 py-3 text-xs font-cinzel font-bold text-caramelo/40 border border-caramelo/30 uppercase tracking-widest transition cursor-not-allowed";
 
             updateProgressStepper(index);
@@ -993,7 +1002,6 @@
             feedback.classList.remove('hidden');
 
             if (isCorrect) {
-                if (collectedDigits[currentStationIndex] !== null) return;
                 feedback.className = "pt-2 text-xs font-bold text-caramelo flex items-center gap-2";
                 feedback.innerHTML = `<i class="fa-solid fa-circle-check text-green-700 text-sm"></i> <span>¡Correcto! Petra confirma la respuesta. Cifra desbloqueada: <strong class="text-sm font-cinzel text-cafe">${digit} (${romanDigit})</strong></span>`;
                 unlockStationDigit(digit);
@@ -1020,7 +1028,6 @@
             const isMatch = data.hardKeywords.some(keyword => userInput.includes(keyword));
 
             if (isMatch) {
-                if (collectedDigits[currentStationIndex] !== null) return;
                 feedback.className = "pt-2 text-xs font-bold text-caramelo flex items-center gap-2";
                 feedback.innerHTML = `<i class="fa-solid fa-circle-check text-green-700 text-sm"></i> <span>¡Excelente cultura general! Cifra desbloqueada: <strong class="text-sm font-cinzel text-cafe">${data.digit} (${data.romanDigit})</strong></span>`;
                 unlockStationDigit(data.digit);
@@ -1046,13 +1053,10 @@
 
             const nextBtn = document.getElementById('btn-next-station');
             nextBtn.disabled = false;
-            if (currentStationIndex < STATIONS.length - 1) {
-                nextBtn.innerText = 'Buscar la señal de la siguiente ubicación →';
-                nextBtn.className = "px-5 py-3 text-xs font-cinzel font-bold text-vainilla bg-caramelo hover:bg-cafe uppercase tracking-widest transition cursor-pointer border border-miel shadow-md";
-            } else {
-                nextBtn.innerText = 'Ir al Arca Imperial →';
-                nextBtn.className = "px-8 py-3 text-xs font-cinzel font-bold text-vainilla bg-caramelo hover:bg-cafe uppercase tracking-widest transition cursor-pointer border border-miel shadow-md";
-            }
+            nextBtn.innerHTML = currentStationIndex < STATIONS.length - 1
+                ? 'Buscar la señal de la siguiente ubicación &rarr;'
+                : 'Ir al Arca Imperial &rarr;';
+            nextBtn.className = "px-5 py-3 text-xs font-cinzel font-bold text-vainilla bg-caramelo hover:bg-cafe uppercase tracking-widest transition cursor-pointer border border-miel shadow-md";
         }
 
         function updateProgressStepper(activeIdx) {
@@ -1065,6 +1069,35 @@
                 } else {
                     el.className = "text-caramelo/50";
                 }
+            }
+        }
+
+        function updateSlider(val) {
+            const overlay = document.getElementById('slider-overlay');
+            const handle = document.getElementById('slider-handle');
+            if (overlay && handle) {
+                overlay.style.width = `${val}%`;
+                handle.style.left = `${val}%`;
+            }
+        }
+
+        function switchStationView(mode) {
+            const sliderBox = document.getElementById('view-slider-container');
+            const panoBox = document.getElementById('view-360-container');
+            const btnSlider = document.getElementById('btn-view-slider');
+            const btnPano = document.getElementById('btn-view-360');
+
+            if (mode === 'slider') {
+                sliderBox.classList.remove('hidden');
+                panoBox.classList.add('hidden');
+                btnSlider.className = "text-cafe border-b-2 border-caramelo font-bold pb-1 transition";
+                btnPano.className = "text-caramelo/60 hover:text-cafe pb-1 transition";
+            } else {
+                sliderBox.classList.add('hidden');
+                panoBox.classList.remove('hidden');
+                btnPano.className = "text-cafe border-b-2 border-caramelo font-bold pb-1 transition";
+                btnSlider.className = "text-caramelo/60 hover:text-cafe pb-1 transition";
+                drawPano();
             }
         }
 
@@ -1082,6 +1115,56 @@
             }
         }
 
+        /* ==========================================================================
+           6. CRYPTEX & TREASURE CHEST UNLOCK
+           ========================================================================== */
+        function changeCryptexDigit(idx, dir) {
+            cryptexIndices[idx] = (cryptexIndices[idx] + dir + 10) % 10;
+            const romanChar = ROMAN_NUMS[cryptexIndices[idx]];
+            document.getElementById(`cryptex-${idx}`).innerText = romanChar;
+            playTone(300 + idx * 50, 0.08);
+        }
+
+        function verifyTreasurePin() {
+            // Target code 7 - 3 - 9 - 2 -> Indices in ROMAN_NUMS: 6 ('VII'), 2 ('III'), 8 ('IX'), 1 ('II')
+            const targetIndices = [6, 2, 8, 1];
+            const isMatch = cryptexIndices.every((val, i) => val === targetIndices[i]);
+
+            if (isMatch) {
+                document.getElementById('pin-error').classList.add('hidden');
+                // Detener Cronómetro al resolver la prueba final
+                stopTimer();
+                playVictoryFanfare();
+                openDiplomaModal();
+            } else {
+                const err = document.getElementById('pin-error');
+                err.classList.remove('hidden');
+                err.innerText = `Combinación incorrecta. Revisa los valores en números romanos: 7 (VII) - 3 (III) - 9 (IX) - 2 (II).`;
+                playTone(150, 0.4);
+            }
+        }
+
+        function openDiplomaModal() {
+            document.getElementById('diploma-player-name').innerText = playerName || "EXPLORADOR/A DE VARIA";
+            document.getElementById('diploma-difficulty-name').innerText = selectedDifficulty === 'easy' ? 'Fácil / Niños de Primaria' : 'Difícil / Cultura General';
+            
+            const now = new Date();
+            const dateStr = `${now.getDate()} de ${now.toLocaleString('es-ES', { month: 'long' })} de ${now.getFullYear()}`;
+            document.getElementById('diploma-date').innerText = dateStr;
+
+            // Inserción del tiempo final en el diploma
+            document.getElementById('diploma-time-taken').innerText = finalElapsedTime || "00:00";
+
+            document.getElementById('diploma-modal').classList.remove('hidden');
+        }
+
+        function closeDiplomaModal() {
+            document.getElementById('diploma-modal').classList.add('hidden');
+        }
+
+        /* ==========================================================================
+           7. MODALS & COLOR LOGIC
+           ========================================================================== */
         /* ==========================================================================
            LECTOR DE COLOR (sustituye al QR)
            Cada estación tiene una "signal" (verde, azul, naranja, rojo).
