@@ -261,7 +261,7 @@
             <!-- STAGE 2: STATIONS TOUR (ALMAZARA -> TERMAS -> ARTESANOS -> CAMPAMENTO) -->
             <section id="stage-game" class="hidden space-y-8">
                 
-                <!-- Stepper Progress Bar & QR Simulator -->
+                <!-- Stepper Progress Bar & Color Scanner -->
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-caramelo/30 pb-4">
                     <div class="flex items-center gap-3 md:gap-6 font-cinzel text-xs tracking-wider flex-wrap justify-center">
                         <span id="step-1-indicator" class="text-cafe font-bold border-b-2 border-caramelo pb-1">1. Almazara</span>
@@ -274,8 +274,8 @@
                     </div>
 
                     <button onclick="openQRScannerModal()" class="px-4 py-2 border border-caramelo text-caramelo hover:bg-caramelo hover:text-vainilla transition font-cinzel text-xs font-bold tracking-widest uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-qrcode"></i>
-                        <span>Escanear QR</span>
+                        <i class="fa-solid fa-camera"></i>
+                        <span>Buscar señal de color</span>
                     </button>
                 </div>
 
@@ -423,7 +423,7 @@
 
                     <button id="btn-next-station" onclick="advanceToNextStation()" disabled
                             class="px-8 py-3 text-xs font-cinzel font-bold text-caramelo/40 border border-caramelo/30 uppercase tracking-widest transition cursor-not-allowed">
-                        Escanear QR de la siguiente ubicación →
+                        Buscar la señal de la siguiente ubicación →
                     </button>
                 </div>
 
@@ -507,21 +507,34 @@
     </footer>
 
 
-    <!-- MODAL 1: INTEGRATED QR CAMERA SCANNER -->
+    <!-- MODAL 1: LECTOR DE COLOR CON CÁMARA -->
     <div id="qr-modal" class="hidden fixed inset-0 z-50 bg-cafe-dark/95 flex items-center justify-center p-4">
         <div class="parchment-sheet roman-border-box max-w-md w-full p-6 text-center space-y-4">
             <div class="flex justify-between items-center border-b border-caramelo/30 pb-2">
-                <h3 class="font-cinzel text-sm font-bold text-cafe uppercase tracking-wider">Escáner QR del Recorrido</h3>
+                <h3 class="font-cinzel text-sm font-bold text-cafe uppercase tracking-wider">Lector de Señales</h3>
                 <button onclick="closeQRModal()" class="text-caramelo hover:text-cafe" aria-label="Cerrar lector">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <p id="qr-scanner-instructions" class="text-xs text-cafe font-sans">
-                Escanea el QR de la ubicación que te corresponde para continuar.
+                Enfoca la señal de color de la ubicación para continuar.
             </p>
-            <div id="qr-reader" class="w-full overflow-hidden border-2 border-caramelo bg-white"></div>
+
+            <!-- Cámara + visor central -->
+            <div id="color-viewer" class="relative w-full aspect-square overflow-hidden border-2 border-caramelo bg-black">
+                <video id="color-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted playsinline></video>
+                <div id="color-reticle" class="absolute border-4 border-white/90 rounded-md pointer-events-none"
+                     style="left:25%; top:25%; width:50%; height:50%; box-shadow:0 0 0 9999px rgba(0,0,0,0.45); transition:border-color .15s;"></div>
+            </div>
+            <canvas id="color-canvas" width="40" height="40" class="hidden"></canvas>
+
+            <!-- Barra de progreso de detección -->
+            <div class="w-full h-3 bg-cafe/30 border border-caramelo overflow-hidden">
+                <div id="color-progress" class="h-full bg-miel" style="width:0%; transition:width .1s linear;"></div>
+            </div>
+
             <p id="qr-scanner-status" class="text-xs font-bold text-caramelo" role="status">Solicitando acceso a la cámara…</p>
-            <p class="text-[11px] text-caramelo/80">Permite el acceso a la cámara. La web debe estar publicada mediante HTTPS para que funcione en el móvil.</p>
+            <p class="text-[11px] text-caramelo/80">Llena el recuadro blanco con la señal y mantenla quieta un segundo. La web debe estar en HTTPS para que funcione la cámara en el móvil.</p>
         </div>
     </div>
 
@@ -611,7 +624,7 @@
                     <li><strong>Fácil (Niños de Primaria):</strong> Preguntas tipo test con la respuesta explícita en el texto.</li>
                     <li><strong>Difícil (Cultura General):</strong> Preguntas históricas abiertas donde deberás escribir la respuesta correcta.</li>
                 </ul>
-                <p><strong>2. Recorrido Arqueológico:</strong> Debes escanear con el lector integrado el QR de cada ubicación. No se puede saltar a la siguiente estación desde los botones.</p>
+                <p><strong>2. Recorrido Arqueológico:</strong> En cada ubicación hay una señal de color. Pulsa «Buscar señal de color», apunta la cámara y mantenla quieta hasta que se llene la barra. No se puede saltar a la siguiente estación desde los botones.</p>
                 <p><strong>3. Las 4 Estaciones:</strong> 1. Almazara &rarr; 2. Termas &rarr; 3. Calle Artesanos &rarr; 4. Campamento Romano.</p>
                 <p><strong>4. Arca Imperial:</strong> Convierte las 4 cifras obtenidas a números romanos (VII - III - IX - II) para abrir el criptex final.</p>
             </div>
@@ -623,8 +636,7 @@
     </div>
 
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
-
+    
     <!-- JAVASCRIPT GAME ENGINE -->
     <script>
         /* ==========================================================================
@@ -633,6 +645,7 @@
         const STATIONS = [
             {
                 id: 'almazara',
+                signal: 'verde',
                 title: '1. La Almazara Romana',
                 location: 'Ubicación actual: Punto Arqueológico Almazara',
                 history: '«¡Hola! Soy Petra. Bienvenidos a la antigua Almazara. Aquí prensábamos las aceitunas recolectadas junto al río Ebro para obtener el preciado aceite de oliva de Varia. El General de la Legión IV ha escondido aquí la primera pista para localizar el Tesoro de Uara».',
@@ -659,6 +672,7 @@
             },
             {
                 id: 'termas',
+                signal: 'azul',
                 title: '2. Las Termas Romanas',
                 location: 'Ubicación actual: La Carnicería',
                 history: '«¡Habéis encontrado el lugar exacto donde estuvo La Carnicería! Bajo nuestros pies se ubican las canalizaciones de las antiguas Termas Romanas. El agua tibia del Caldarium relajaba a los soldados de la Legio IV Macedónica tras sus patrullas».',
@@ -685,6 +699,7 @@
             },
             {
                 id: 'artesanos',
+                signal: 'naranja',
                 title: '3. Calle de los Artesanos',
                 location: 'Ubicación actual: El Laberinto',
                 history: '«¡Excelente orientación! Habéis llegado a El Laberinto. En época romana, esta calle hervía de actividad con alfareros moldeando la famosa vajilla roja de cerámica Terra Sigillata decorada con sellos únicos».',
@@ -711,6 +726,7 @@
             },
             {
                 id: 'campamento',
+                signal: 'rojo',
                 title: '4. Campamento Romano',
                 location: 'Ubicación actual: Plaza de la Iglesia',
                 history: '«¡Habéis alcanzado la Plaza de la Iglesia! Aquí estuvo la sede principal del campamento militar romano levantado por la Legio IV Macedónica durante las Guerras Cántabras. ¡El Arca con el Tesoro de Uara está esperándonos!»',
@@ -745,8 +761,11 @@
         let selectedDifficulty = "easy"; // "easy" or "hard"
         let currentStationIndex = -1;
         let collectedDigits = [null, null, null, null];
-        let qrScanner = null;
+        let camStream = null;
+        let scanTimer = null;
         let scannerStarting = false;
+        let holdFrames = 0;
+        let lastDetected = null;
         let cryptexIndices = [0, 0, 0, 0]; // Index 0 = 'I'
         let audioActive = false;
         let audioCtx = null;
@@ -891,20 +910,20 @@
             document.getElementById('stage-intro').classList.add('hidden');
             document.getElementById('stage-game').classList.remove('hidden');
 
-            // Iniciar cronómetro; la primera estación solo se abre al escanear su QR.
+            // Iniciar cronómetro; la primera estación solo se abre al detectar su color.
             startTimer();
             currentStationIndex = -1;
-            document.getElementById('station-title').innerText = 'Escanea el QR del primer punto';
+            document.getElementById('station-title').innerText = 'Encuentra la señal del primer punto';
             document.getElementById('station-tag').innerText = 'Acceso pendiente';
-            document.getElementById('station-location-badge').innerText = 'Escanea el QR de La Almazara para comenzar';
-            document.getElementById('station-history-text').innerText = 'Petra te espera en el primer punto. Pulsa “Escanear QR” y enfoca el código colocado en la ubicación.';
-            document.getElementById('station-question').innerText = 'La pregunta aparecerá cuando escanees el QR correcto.';
+            document.getElementById('station-location-badge').innerText = 'Busca la señal VERDE de La Almazara para comenzar';
+            document.getElementById('station-history-text').innerText = 'Petra te espera en el primer punto. Pulsa “Buscar señal de color” y enfoca con la cámara la señal colocada en la ubicación.';
+            document.getElementById('station-question').innerText = 'La pregunta aparecerá cuando la cámara detecte la señal correcta.';
             document.getElementById('question-options-easy').innerHTML = '';
             document.getElementById('question-options-easy').classList.add('hidden');
             document.getElementById('question-input-hard').classList.add('hidden');
             document.getElementById('riddle-box').classList.add('opacity-50');
             document.getElementById('btn-next-station').disabled = true;
-            document.getElementById('btn-next-station').innerText = 'Escanea el QR de inicio';
+            document.getElementById('btn-next-station').innerText = 'Busca la señal de inicio';
             document.getElementById('btn-next-station').className = 'px-8 py-3 text-xs font-cinzel font-bold text-caramelo/40 border border-caramelo/30 uppercase tracking-widest cursor-not-allowed';
             playCoinSound();
             openQRScannerModal();
@@ -1028,7 +1047,7 @@
             const nextBtn = document.getElementById('btn-next-station');
             nextBtn.disabled = false;
             if (currentStationIndex < STATIONS.length - 1) {
-                nextBtn.innerText = 'Escanear QR de la siguiente ubicación →';
+                nextBtn.innerText = 'Buscar la señal de la siguiente ubicación →';
                 nextBtn.className = "px-5 py-3 text-xs font-cinzel font-bold text-vainilla bg-caramelo hover:bg-cafe uppercase tracking-widest transition cursor-pointer border border-miel shadow-md";
             } else {
                 nextBtn.innerText = 'Ir al Arca Imperial →';
@@ -1051,7 +1070,7 @@
 
         function advanceToNextStation() {
             if (currentStationIndex < 0 || collectedDigits[currentStationIndex] === null) {
-                alert('Primero debes escanear el QR de esta ubicación y resolver su pregunta.');
+                alert('Primero debes encontrar la señal de esta ubicación y resolver su pregunta.');
                 return;
             }
             if (currentStationIndex < STATIONS.length - 1) {
@@ -1063,7 +1082,69 @@
             }
         }
 
-        /* QR payloads: VAREA|almazara, VAREA|termas, VAREA|artesanos, VAREA|campamento */
+        /* ==========================================================================
+           LECTOR DE COLOR (sustituye al QR)
+           Cada estación tiene una "signal" (verde, azul, naranja, rojo).
+           Para cambiar a un dibujo más adelante, basta con sustituir la función
+           analyzeFrame() por otro detector y mantener el resto igual.
+           ========================================================================== */
+        const SIGNALS = {
+            verde:   { label: 'VERDE',   test: (h, s, v) => h >= 75  && h <= 165 && s >= 0.35 && v >= 0.20 },
+            azul:    { label: 'AZUL',    test: (h, s, v) => h >= 185 && h <= 265 && s >= 0.35 && v >= 0.20 },
+            naranja: { label: 'NARANJA', test: (h, s, v) => h >= 16  && h <= 44  && s >= 0.60 && v >= 0.60 },
+            rojo:    { label: 'ROJO',    test: (h, s, v) => (h <= 12 || h >= 340) && s >= 0.50 && v >= 0.25 }
+        };
+        const DETECT_RATIO = 0.55;   // % del recuadro que debe ser del color
+        const HOLD_NEEDED = 8;       // lecturas seguidas (~1 s) para confirmar
+        const SCAN_INTERVAL_MS = 120;
+
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+            let h = 0;
+            if (d !== 0) {
+                if (max === r) h = ((g - b) / d) % 6;
+                else if (max === g) h = (b - r) / d + 2;
+                else h = (r - g) / d + 4;
+                h *= 60; if (h < 0) h += 360;
+            }
+            return [h, max === 0 ? 0 : d / max, max];
+        }
+
+        // Analiza el recuadro central del vídeo y devuelve el % de cada color
+        function analyzeFrame() {
+            const video = document.getElementById('color-video');
+            const canvas = document.getElementById('color-canvas');
+            if (!video.videoWidth) return null;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const side = Math.min(video.videoWidth, video.videoHeight) * 0.5;
+            const sx = (video.videoWidth - side) / 2;
+            const sy = (video.videoHeight - side) / 2;
+            ctx.drawImage(video, sx, sy, side, side, 0, 0, canvas.width, canvas.height);
+            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            const counts = { verde: 0, azul: 0, naranja: 0, rojo: 0 };
+            const total = data.length / 4;
+            for (let i = 0; i < data.length; i += 4) {
+                const [h, s, v] = rgbToHsv(data[i], data[i + 1], data[i + 2]);
+                for (const key in SIGNALS) {
+                    if (SIGNALS[key].test(h, s, v)) { counts[key]++; break; }
+                }
+            }
+            const ratios = {};
+            for (const key in counts) ratios[key] = counts[key] / total;
+            return ratios;
+        }
+
+        function setProgress(pct, color) {
+            const bar = document.getElementById('color-progress');
+            bar.style.width = pct + '%';
+            const ret = document.getElementById('color-reticle');
+            ret.style.borderColor = color || 'rgba(255,255,255,0.9)';
+        }
+
+        const SIGNAL_CSS = { verde: '#22c55e', azul: '#3b82f6', naranja: '#f97316', rojo: '#ef4444' };
+
         function openQRScannerModal() {
             const modal = document.getElementById('qr-modal');
             const status = document.getElementById('qr-scanner-status');
@@ -1075,60 +1156,82 @@
                 modal.classList.remove('hidden');
                 return;
             }
+            const expectedSignal = SIGNALS[STATIONS[expectedIndex].signal].label;
             instructions.innerText = currentStationIndex < 0
-                ? 'Para iniciar la aventura, escanea el QR 1: La Almazara.'
-                : `Prueba superada. Escanea el QR ${expectedIndex + 1}: ${STATIONS[expectedIndex].title.replace(/^\\d+\\. /, '')}.`;
+                ? `Para iniciar la aventura, enfoca la señal ${expectedSignal} de La Almazara.`
+                : `Prueba superada. Enfoca la señal ${expectedSignal}: ${STATIONS[expectedIndex].title.replace(/^\d+\. /, '')}.`;
             status.innerText = 'Preparando cámara…';
+            setProgress(0);
+            holdFrames = 0;
+            lastDetected = null;
             modal.classList.remove('hidden');
 
-            if (typeof Html5Qrcode === 'undefined') {
-                status.innerText = 'No se ha podido cargar el lector. Comprueba tu conexión a Internet y vuelve a intentarlo.';
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                status.innerText = 'Este navegador no permite usar la cámara. Abre la web en HTTPS desde Chrome o Safari.';
                 return;
             }
-            if (qrScanner || scannerStarting) return;
+            if (camStream || scannerStarting) return;
             scannerStarting = true;
-            qrScanner = new Html5Qrcode('qr-reader');
-            qrScanner.start(
-                { facingMode: 'environment' },
-                { fps: 10, qrbox: { width: 230, height: 230 } },
-                decodedText => handleScannedQR(decodedText),
-                () => {}
-            ).then(() => {
+
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
+                audio: false
+            }).then(stream => {
+                camStream = stream;
                 scannerStarting = false;
-                status.innerText = 'Cámara activa. Enfoca el código QR de la ubicación.';
+                const video = document.getElementById('color-video');
+                video.srcObject = stream;
+                return video.play();
+            }).then(() => {
+                status.innerText = 'Cámara activa. Llena el recuadro con la señal de color.';
+                if (scanTimer) clearInterval(scanTimer);
+                scanTimer = setInterval(scanTick, SCAN_INTERVAL_MS);
             }).catch(err => {
                 scannerStarting = false;
-                qrScanner = null;
+                stopQRScanner();
                 status.innerText = 'No se pudo abrir la cámara. Permite el acceso y comprueba que la web esté en HTTPS.';
             });
         }
 
-        function handleScannedQR(decodedText) {
+        function scanTick() {
             const status = document.getElementById('qr-scanner-status');
-            let stationId = decodedText.trim();
+            const ratios = analyzeFrame();
+            if (!ratios) return;
 
-            // Accept payloads such as VAREA|termas or URLs containing ?station=termas.
-            try {
-                if (stationId.includes('://')) {
-                    const parsed = new URL(stationId);
-                    stationId = parsed.searchParams.get('station') || parsed.searchParams.get('qr') || stationId;
-                }
-            } catch (e) {}
-            if (stationId.toUpperCase().startsWith('VAREA|')) stationId = stationId.split('|')[1];
-            stationId = stationId.toLowerCase().replace(/^station[-_:]/, '').trim();
-
-            const targetIdx = STATIONS.findIndex(st => st.id === stationId);
-            const expectedIndex = currentStationIndex < 0 ? 0 : currentStationIndex + 1;
-
-            if (targetIdx === -1) {
-                status.innerText = 'Este QR no pertenece al recorrido de Varea. Escanea uno de los códigos oficiales.';
-                playTone(180, 0.25);
+            // Color dominante del recuadro
+            let best = null, bestRatio = 0;
+            for (const key in ratios) {
+                if (ratios[key] > bestRatio) { best = key; bestRatio = ratios[key]; }
+            }
+            if (!best || bestRatio < DETECT_RATIO) {
+                holdFrames = 0; lastDetected = null;
+                setProgress(0);
+                status.innerText = 'Buscando la señal… llena el recuadro con el color.';
                 return;
             }
+
+            // Mismo color varias lecturas seguidas
+            if (best === lastDetected) holdFrames++; else { lastDetected = best; holdFrames = 1; }
+            setProgress(Math.min(100, Math.round(holdFrames / HOLD_NEEDED * 100)), SIGNAL_CSS[best]);
+            status.innerText = `Detectando ${SIGNALS[best].label}… mantén quieta la cámara.`;
+
+            if (holdFrames >= HOLD_NEEDED) {
+                holdFrames = 0;
+                handleDetectedSignal(best);
+            }
+        }
+
+        function handleDetectedSignal(signalName) {
+            const status = document.getElementById('qr-scanner-status');
+            const targetIdx = STATIONS.findIndex(st => st.signal === signalName);
+            const expectedIndex = currentStationIndex < 0 ? 0 : currentStationIndex + 1;
+
+            if (targetIdx === -1) return;
             if (targetIdx !== expectedIndex) {
                 status.innerText = targetIdx <= currentStationIndex
-                    ? 'Este punto ya se ha visitado. Busca el QR de la siguiente ubicación.'
-                    : 'Todavía no puedes acceder a ese punto. Sigue el orden del recorrido y escanea el QR indicado.';
+                    ? `La señal ${SIGNALS[signalName].label} ya se ha visitado. Busca la de la siguiente ubicación.`
+                    : `Todavía no puedes acceder a la señal ${SIGNALS[signalName].label}. Sigue el orden del recorrido.`;
+                setProgress(0);
                 playTone(180, 0.25);
                 return;
             }
@@ -1145,14 +1248,16 @@
         }
 
         async function stopQRScanner() {
-            if (qrScanner) {
-                try {
-                    if (qrScanner.isScanning) await qrScanner.stop();
-                    await qrScanner.clear();
-                } catch (e) {}
-                qrScanner = null;
+            if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+            if (camStream) {
+                camStream.getTracks().forEach(t => t.stop());
+                camStream = null;
             }
+            const video = document.getElementById('color-video');
+            if (video) video.srcObject = null;
             scannerStarting = false;
+            holdFrames = 0;
+            lastDetected = null;
         }
 
         function closeQRModal() {
