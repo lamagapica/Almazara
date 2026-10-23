@@ -273,16 +273,10 @@
                         <span id="step-4-indicator" class="text-caramelo/50">4. Campamento</span>
                     </div>
 
-                    <div class="flex flex-wrap items-center justify-center gap-2">
-                        <button onclick="openQRScannerModal()" class="px-4 py-2 border border-caramelo text-caramelo hover:bg-caramelo hover:text-vainilla transition font-cinzel text-xs font-bold tracking-widest uppercase flex items-center gap-2">
-                            <i class="fa-solid fa-qrcode"></i>
-                            <span>Escanear QR</span>
-                        </button>
-                        <button onclick="temporaryAdvanceStation()" class="px-4 py-2 border-2 border-red-700 text-red-800 bg-red-100 hover:bg-red-200 transition font-cinzel text-xs font-bold tracking-widest uppercase flex items-center gap-2" title="Botón temporal para pruebas; no requiere escanear el QR">
-                            <i class="fa-solid fa-forward-step"></i>
-                            <span>Avance temporal (pruebas)</span>
-                        </button>
-                    </div>
+                    <button onclick="openQRScannerModal()" class="px-4 py-2 border border-caramelo text-caramelo hover:bg-caramelo hover:text-vainilla transition font-cinzel text-xs font-bold tracking-widest uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-qrcode"></i>
+                        <span>Escanear QR</span>
+                    </button>
                 </div>
 
                 <!-- Station Header -->
@@ -1062,28 +1056,6 @@
             }
             if (currentStationIndex < STATIONS.length - 1) {
                 openQRScannerModal();
-            } else {
-                document.getElementById('stage-game').classList.add('hidden');
-                document.getElementById('stage-victory').classList.remove('hidden');
-                playLockSound();
-            }
-        }
-
-        // BOTÓN TEMPORAL DE PRUEBAS: permite saltar el escaneo QR.
-        // Se mantiene la obligación de resolver cada enigma para obtener su cifra.
-        function temporaryAdvanceStation() {
-            if (currentStationIndex < 0) {
-                loadStation(0);
-                playCoinSound();
-                return;
-            }
-            if (collectedDigits[currentStationIndex] === null) {
-                alert('Para avanzar, primero resuelve el enigma de esta estancia. Este botón solo omite el escaneo QR.');
-                return;
-            }
-            if (currentStationIndex < STATIONS.length - 1) {
-                loadStation(currentStationIndex + 1);
-                playCoinSound();
             } else {
                 document.getElementById('stage-game').classList.add('hidden');
                 document.getElementById('stage-victory').classList.remove('hidden');
