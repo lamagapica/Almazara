@@ -13,6 +13,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#26160d">
     <title>El Secreto de Varia - El Tesoro de Uara</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -79,6 +80,42 @@
         @media (max-width: 639px) {
             .parchment-sheet.roman-border-box { outline-offset: -4px; }
             #qr-modal > div, #instructions-modal > div { max-height: 92dvh; overflow-y: auto; }
+        }
+
+
+        /* ===== RESPONSIVE EXTRA ===== */
+        /* Stepper: desplazamiento horizontal (overflow scroll) en pantallas pequeñas */
+        .step-scroller {
+            display: flex; flex-wrap: nowrap; white-space: nowrap;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            max-width: 100%; scrollbar-width: none; scroll-snap-type: x proximity;
+            justify-content: flex-start;
+        }
+        .step-scroller::-webkit-scrollbar { display: none; }
+        .step-scroller > * { flex: 0 0 auto; scroll-snap-align: center; }
+        @media (min-width: 768px) {
+            .step-scroller { flex-wrap: wrap; white-space: normal; overflow: visible; justify-content: center; }
+        }
+        /* Visores con relación de aspecto en vez de alto fijo */
+        .viewer-box { aspect-ratio: 4 / 3; max-height: 70vh; max-height: 70dvh; }
+        @media (min-width: 640px) { .viewer-box { aspect-ratio: 16 / 10; } }
+        @media (min-width: 1024px) { .viewer-box { aspect-ratio: 4 / 3; max-height: 560px; } }
+        /* Botones táctiles cómodos */
+        .touch-target { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+        /* Móvil en horizontal: poco alto disponible */
+        @media (orientation: landscape) and (max-height: 500px) {
+            #color-viewer { max-width: min(100%, 55dvh) !important; }
+            .viewer-box { aspect-ratio: 16 / 9; max-height: 80dvh; }
+            main { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        }
+        /* Márgenes seguros también en los modales */
+        #qr-modal, #diploma-modal, #instructions-modal {
+            padding-left: max(0.75rem, env(safe-area-inset-left));
+            padding-right: max(0.75rem, env(safe-area-inset-right));
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
         }
 
         /* CONTINUOUS PARCHMENT SURFACE */
@@ -298,7 +335,7 @@
                 
                 <!-- Stepper Progress Bar & Color Scanner -->
                 <div class="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 border-b border-caramelo/30 pb-4">
-                    <div class="flex items-center gap-x-2 gap-y-1 md:gap-6 font-cinzel text-[10px] sm:text-xs tracking-wide md:tracking-wider flex-wrap justify-center">
+                    <div class="step-scroller items-center gap-x-2 gap-y-1 md:gap-6 font-cinzel text-[10px] sm:text-xs tracking-wide md:tracking-wider w-full md:w-auto pb-1">
                         <span id="step-1-indicator" class="text-cafe font-bold border-b-2 border-caramelo pb-1">1. Almazara</span>
                         <span class="text-caramelo/40">&rarr;</span>
                         <span id="step-2-indicator" class="text-caramelo/50">2. Termas</span>
@@ -335,20 +372,20 @@
                         
                         <!-- Toggle View Mode -->
                         <div class="flex gap-4 sm:gap-6 border-b border-caramelo/20 pb-2 text-[11px] sm:text-xs font-cinzel">
-                            <button id="btn-view-slider" onclick="switchStationView('slider')" class="text-cafe border-b-2 border-caramelo font-bold pb-1 transition">
+                            <button id="btn-view-slider" onclick="switchStationView('slider')" class="touch-target text-cafe border-b-2 border-caramelo font-bold pb-1 transition">
                                 <i class="fa-solid fa-sliders mr-1"></i> Romana vs Hoy
                             </button>
-                            <button id="btn-view-360" onclick="switchStationView('360')" class="text-caramelo/60 hover:text-cafe pb-1 transition">
+                            <button id="btn-view-360" onclick="switchStationView('360')" class="touch-target text-caramelo/60 hover:text-cafe pb-1 transition">
                                 <i class="fa-solid fa-compass mr-1"></i> Visor 360°
                             </button>
                         </div>
 
                         <!-- Viewer 1: 3D Before/After Slider -->
-                        <div id="view-slider-container" class="relative border-2 border-caramelo h-60 sm:h-72 md:h-80 bg-cafe/20 overflow-hidden">
-                            <img id="img-actual" src="" alt="Varea Actualidad" class="w-full h-full object-cover">
+                        <div id="view-slider-container" class="viewer-box relative border-2 border-caramelo w-full bg-cafe/20 overflow-hidden">
+                            <img id="img-actual" src="" alt="Varea Actualidad" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             
                             <div id="slider-overlay" class="slider-img-after">
-                                <img id="img-roman" src="" alt="Varia Romana" class="absolute top-0 left-0 max-w-none h-full object-cover">
+                                <img id="img-roman" src="" alt="Varia Romana" loading="lazy" decoding="async" class="absolute top-0 left-0 max-w-none h-full object-cover">
                             </div>
 
                             <input type="range" min="0" max="100" value="50" id="time-slider" oninput="updateSlider(this.value)" 
@@ -369,7 +406,7 @@
                         </div>
 
                         <!-- Viewer 2: Draggable 360° Canvas -->
-                        <div id="view-360-container" class="hidden relative border-2 border-caramelo h-60 sm:h-72 md:h-80 bg-cafe/30 cursor-grab active:cursor-grabbing overflow-hidden">
+                        <div id="view-360-container" class="viewer-box hidden relative border-2 border-caramelo w-full bg-cafe/30 cursor-grab active:cursor-grabbing overflow-hidden">
                             <canvas id="canvas-360" class="w-full h-full"></canvas>
                             <div class="absolute bottom-2 left-2 right-2 sm:right-auto sm:bottom-3 sm:left-3 text-[10px] sm:text-[11px] font-cinzel text-vainilla bg-cafe/90 px-2 sm:px-3 py-1 border border-miel/40 pointer-events-none text-center">
                                 Desliza horizontalmente para explorar en 360°
@@ -487,33 +524,33 @@
                     
                     <!-- Rotator 1 -->
                     <div class="flex flex-col items-center">
-                        <button onclick="changeCryptexDigit(0, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button onclick="changeCryptexDigit(0, 1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-0" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
-                        <button onclick="changeCryptexDigit(0, -1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        <button onclick="changeCryptexDigit(0, -1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-down"></i></button>
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 1 (7)</span>
                     </div>
 
                     <!-- Rotator 2 -->
                     <div class="flex flex-col items-center">
-                        <button onclick="changeCryptexDigit(1, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button onclick="changeCryptexDigit(1, 1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-1" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
-                        <button onclick="changeCryptexDigit(1, -1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        <button onclick="changeCryptexDigit(1, -1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-down"></i></button>
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 2 (3)</span>
                     </div>
 
                     <!-- Rotator 3 -->
                     <div class="flex flex-col items-center">
-                        <button onclick="changeCryptexDigit(2, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button onclick="changeCryptexDigit(2, 1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-2" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
-                        <button onclick="changeCryptexDigit(2, -1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        <button onclick="changeCryptexDigit(2, -1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-down"></i></button>
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 3 (9)</span>
                     </div>
 
                     <!-- Rotator 4 -->
                     <div class="flex flex-col items-center">
-                        <button onclick="changeCryptexDigit(3, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button onclick="changeCryptexDigit(3, 1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-3" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
-                        <button onclick="changeCryptexDigit(3, -1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        <button onclick="changeCryptexDigit(3, -1)" class="touch-target text-caramelo hover:text-cafe text-sm"><i class="fa-solid fa-chevron-down"></i></button>
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 4 (2)</span>
                     </div>
 
@@ -547,7 +584,7 @@
         <div class="parchment-sheet roman-border-box max-w-md w-full p-4 sm:p-6 text-center space-y-3 sm:space-y-4 my-auto">
             <div class="flex justify-between items-center border-b border-caramelo/30 pb-2">
                 <h3 class="font-cinzel text-sm font-bold text-cafe uppercase tracking-wider">Lector de Señales</h3>
-                <button onclick="closeQRModal()" class="text-caramelo hover:text-cafe" aria-label="Cerrar lector">
+                <button onclick="closeQRModal()" class="touch-target text-caramelo hover:text-cafe" aria-label="Cerrar lector">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -579,7 +616,7 @@
         <div class="max-w-3xl w-full p-4 sm:p-6 md:p-14 text-center border-4 sm:border-8 border-caramelo bg-vainilla text-cafe space-y-5 sm:space-y-6 my-auto relative shadow-2xl">
             
             <div class="no-print flex justify-end">
-                <button onclick="closeDiplomaModal()" class="text-caramelo hover:text-cafe">
+                <button onclick="closeDiplomaModal()" class="touch-target text-caramelo hover:text-cafe" aria-label="Cerrar diploma">
                     <i class="fa-solid fa-xmark text-2xl"></i>
                 </button>
             </div>
@@ -983,6 +1020,19 @@
             const sl = document.getElementById('time-slider');
             if (sl) updateSlider(sl.value);
         }
+
+        /* Stepper con scroll horizontal: mantiene visible el paso activo */
+        (function () {
+            const ids = ['step-1-indicator','step-2-indicator','step-3-indicator','step-4-indicator'];
+            const focusActive = () => {
+                const act = ids.map(i => document.getElementById(i)).find(el => el && el.classList.contains('font-bold'));
+                if (act && act.scrollIntoView) act.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+            };
+            window.addEventListener('DOMContentLoaded', () => {
+                const mo = new MutationObserver(focusActive);
+                ids.forEach(i => { const el = document.getElementById(i); if (el) mo.observe(el, { attributes: true, attributeFilter: ['class'] }); });
+            });
+        })();
         window.addEventListener('resize', onViewportChange);
         window.addEventListener('orientationchange', () => setTimeout(onViewportChange, 250));
 
