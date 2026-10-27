@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+<!--
+  ================= NOTAS RÁPIDAS =================
+  1) NOMBRES DE IMÁGENES (sliders y 360°): busca  "const IMG"  (bloque ★★★ justo antes del motor del juego).
+  2) DIBUJOS DETECTORES DE CÁMARA (Almazara y Termas): busca  "IMAGE_DETECTORS".
+     Están incrustados en el HTML; no dependen de ningún nombre de archivo.
+     Ahí también está el "threshold" (sensibilidad) de cada dibujo.
+  3) Orden de estaciones y su señal (dibujo / color): busca  "signal:"  dentro de STATIONS.
+  4) Todos los archivos de imagen van en la MISMA carpeta que index.html en GitHub.
+  =================================================
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -664,6 +674,41 @@
     <!-- JAVASCRIPT GAME ENGINE -->
     <script>
         /* ==========================================================================
+           ★★★ NOMBRES DE LAS IMÁGENES — CAMBIA AQUÍ LOS NOMBRES ★★★
+           Tienen que ser IDÉNTICOS al archivo que hay en GitHub (mayúsculas,
+           espacios y extensión incluidos: GitHub Pages distingue mayúsculas).
+           Los archivos van en la misma carpeta que index.html.
+           ========================================================================== */
+        const IMG = {
+            // ---- ESTACIÓN 1: ALMAZARA ----
+            almazaraSliderRomano: 'Almazara.png',          // ← slider "romano"  (imagen que se desliza por encima)
+            almazaraSliderActual: 'almazara romana.png',   // ← slider "actual"  (imagen de fondo)
+            almazara360:          null,                    // ← AÚN SIN ARCHIVO: pon aquí el nombre de su 360 (ej. 'almazara 360.png')
+
+            // ---- ESTACIÓN 2: TERMAS ----
+            termasSliderRomano:   'termas romanas.png',    // ← slider "romano"
+            termasSliderActual:   'termas actual.jpg',     // ← slider "actual"  (OJO: es .jpg, no .png)
+            termas360:            'termas 360.png',        // ← visor 360°
+
+            // ---- ESTACIÓN 3 (Calle Artesanos) y 4 (Campamento): AÚN SIN ARCHIVOS ----
+            // Mientras estén vacíos se usan fotos de prueba de internet (fallback en STATIONS).
+            artesanosSliderRomano: null,
+            artesanosSliderActual: null,
+            artesanos360:          null,
+            campamentoSliderRomano: null,
+            campamentoSliderActual: null,
+            campamento360:          null
+        };
+        // Si el nombre está vacío (null) se usa la foto de prueba; si no, se usa tu archivo.
+        // encodeURI permite nombres con espacios ("almazara romana.png").
+        const imgPath = (name, fallback) => name ? encodeURI(name) : fallback;
+
+        /* (Los dibujos detectores de cámara NO dependen de archivos: están incrustados
+           dentro de este HTML en IMAGE_DETECTORS. Los PNG "Detector ..." del repositorio
+           solo sirven para imprimirlos.) */
+    </script>
+    <script>
+        /* ==========================================================================
            1. STATIONS DATA WITH DUAL DIFFICULTY (EASY & HARD)
            ========================================================================== */
         const STATIONS = [
@@ -690,9 +735,10 @@
                 digit: '7',
                 romanDigit: 'VII',
                 nextClue: '«¡Muy bien hecho! Habéis conseguido la Cifra 1: VII (7). Para la siguiente pista: Debéis ir a Las Termas, que en la Varea actual se encuentran donde la Carnicería».',
-                imgRoman: 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80',
-                imgActual: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
-                pano360: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80'
+                // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
+                imgRoman:  imgPath(IMG.almazaraSliderRomano, 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80'),
+                imgActual: imgPath(IMG.almazaraSliderActual, 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'),
+                pano360:   imgPath(IMG.almazara360,          'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80')
             },
             {
                 id: 'termas',
@@ -717,9 +763,10 @@
                 digit: '3',
                 romanDigit: 'III',
                 nextClue: '«¡Fantástico! Ya tenéis la Cifra 2: III (3). Escuchad la pista de Petra: Avanzad hacia la Calle de los Artesanos, que hoy se oculta donde está El Laberinto».',
-                imgRoman: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80',
-                imgActual: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
-                pano360: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1200&q=80'
+                // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
+                imgRoman:  imgPath(IMG.termasSliderRomano, 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80'),
+                imgActual: imgPath(IMG.termasSliderActual, 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80'),
+                pano360:   imgPath(IMG.termas360,          'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1200&q=80')
             },
             {
                 id: 'artesanos',
@@ -744,9 +791,10 @@
                 digit: '9',
                 romanDigit: 'IX',
                 nextClue: '«¡Sois imparables! Lograsteis la Cifra 3: IX (9). La última pista dice: Buscad el antiguo Campamento Romano de la Legión IV Macedónica, situado en la Plaza de la Iglesia».',
-                imgRoman: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
-                imgActual: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=800&q=80',
-                pano360: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80'
+                // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
+                imgRoman:  imgPath(IMG.artesanosSliderRomano, 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'),
+                imgActual: imgPath(IMG.artesanosSliderActual, 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=800&q=80'),
+                pano360:   imgPath(IMG.artesanos360,          'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80')
             },
             {
                 id: 'campamento',
@@ -771,9 +819,10 @@
                 digit: '2',
                 romanDigit: 'II',
                 nextClue: '«¡Teníamos razón! Cifra 4 obtenida: II (2). ¡Acompañad a Petra a introducir el código completo 7-3-9-2 en números romanos (VII - III - IX - II) en el Criptex!»',
-                imgRoman: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
-                imgActual: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80',
-                pano360: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80'
+                // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
+                imgRoman:  imgPath(IMG.campamentoSliderRomano, 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80'),
+                imgActual: imgPath(IMG.campamentoSliderActual, 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80'),
+                pano360:   imgPath(IMG.campamento360,          'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80')
             }
         ];
 
