@@ -176,7 +176,7 @@
                 </div>
             </div>
 
-            <!-- Badge con Nombre, Dificultad y Cronómetro (en móvil va en su propia fila) -->
+            <!-- Badge con Nombre, Dificultad y Cronómetro -->
             <div id="player-badge" class="hidden order-3 sm:order-2 w-full sm:w-auto text-xs text-vainilla flex items-center justify-between sm:justify-start gap-2 border-t border-miel/30 pt-2 sm:border-t-0 sm:pt-0 sm:border-x sm:px-4">
                 <div class="flex items-center gap-2 min-w-0">
                     <span class="text-miel font-cinzel uppercase hidden md:inline">Explorador/a:</span>
@@ -193,19 +193,16 @@
 
             <!-- Controles -->
             <div class="order-2 sm:order-3 flex items-center gap-2">
-                <!-- BOTÓN PARA DESCARGAR / INSTALAR APP EN MÓVIL (SÓLO ARRIBA EN CABECERA) -->
                 <button id="pwa-install-btn" onclick="installPWA()" class="px-2.5 py-1 md:px-3 md:py-1.5 bg-miel/20 border border-miel text-miel hover:bg-miel hover:text-cafe-dark transition rounded text-xs font-cinzel uppercase font-bold flex items-center gap-1.5 shadow-sm" title="Descargar como App para el Teléfono" aria-label="Descargar App">
                     <i class="fa-solid fa-mobile-screen-button text-sm animate-pulse"></i>
                     <span class="inline">Descargar App</span>
                 </button>
 
-                <!-- Web Audio Toggle -->
                 <button id="audio-btn" onclick="toggleAudio()" class="min-w-[44px] min-h-[44px] justify-center text-miel hover:text-vainilla transition text-xs font-cinzel uppercase flex items-center gap-1.5" title="Sonido" aria-label="Sonido">
                     <i id="audio-icon" class="fa-solid fa-volume-xmark text-vainilla/50"></i>
                     <span class="hidden sm:inline">Sonido</span>
                 </button>
 
-                <!-- Instructions Button -->
                 <button onclick="showInstructions()" class="min-w-[44px] min-h-[44px] justify-center text-xs font-cinzel text-miel hover:text-vainilla transition uppercase tracking-widest flex items-center gap-1.5" aria-label="Guía">
                     <i class="fa-solid fa-scroll"></i>
                     <span class="hidden sm:inline">Guía</span>
@@ -215,12 +212,12 @@
         </div>
     </header>
 
-    <!-- MAIN GAME AREA (PARCHMENT SURFACE) -->
+    <!-- MAIN GAME AREA -->
     <main class="relative z-10 flex-grow max-w-5xl w-full mx-auto my-3 md:my-8 px-2 sm:px-4">
         
         <div class="parchment-sheet roman-border-box p-4 sm:p-6 md:p-12 space-y-6 md:space-y-8 shadow-2xl">
             
-            <!-- STAGE 1: WELCOME, DIFFICULTY SELECTION & PLAYER NAME INPUT -->
+            <!-- STAGE 1: WELCOME & DIFFICULTY -->
             <section id="stage-intro" class="space-y-8">
                 
                 <div class="text-center space-y-3">
@@ -233,7 +230,6 @@
                     <div class="roman-divider max-w-md mx-auto"></div>
                 </div>
 
-                <!-- Story Mystery Introduction from Petra -->
                 <div class="space-y-4 text-sm md:text-base text-cafe leading-relaxed font-sans text-left md:text-center max-w-3xl mx-auto">
                     <p class="text-base sm:text-lg font-roman text-caramelo font-semibold">
                         «Mi nombre es Petra y soy una joven romana de Vareia. ¡Tenemos una misión urgente!»
@@ -246,17 +242,13 @@
                     </p>
                 </div>
 
-                <!-- Form Controls: Difficulty & Name -->
                 <div class="max-w-xl mx-auto space-y-6 pt-4">
-                    
-                    <!-- Difficulty Selector Cards -->
                     <div class="space-y-3">
                         <label class="block font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest text-center">
                             Elige tu Nivel de Dificultad:
                         </label>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Easy Option -->
                             <div id="card-diff-easy" onclick="selectDifficulty('easy')" class="cursor-pointer border-2 border-caramelo p-4 bg-vainilla hover:bg-miel/20 transition space-y-2 text-left relative">
                                 <div class="flex items-center justify-between">
                                     <span class="font-cinzel font-bold text-sm text-cafe flex items-center gap-2">
@@ -272,7 +264,6 @@
                                 </div>
                             </div>
 
-                            <!-- Hard Option -->
                             <div id="card-diff-hard" onclick="selectDifficulty('hard')" class="cursor-pointer border-2 border-caramelo/40 p-4 bg-vainilla/50 hover:bg-miel/20 transition space-y-2 text-left relative opacity-80">
                                 <div class="flex items-center justify-between">
                                     <span class="font-cinzel font-bold text-sm text-cafe flex items-center gap-2">
@@ -290,7 +281,6 @@
                         </div>
                     </div>
 
-                    <!-- Name Input Box -->
                     <div class="space-y-2 text-center">
                         <label for="player-name-input" class="block font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest">
                             Inscribe tu Nombre en el Pergamino del Explorador:
@@ -308,10 +298,9 @@
             </section>
 
 
-            <!-- STAGE 2: STATIONS TOUR (ALMAZARA -> TERMAS -> ARTESANOS -> CAMPAMENTO) -->
+            <!-- STAGE 2: STATIONS TOUR -->
             <section id="stage-game" class="hidden space-y-8">
                 
-                <!-- Stepper Progress Bar & Color Scanner -->
                 <div class="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 border-b border-caramelo/30 pb-4">
                     <div class="flex items-center gap-x-2 gap-y-1 md:gap-6 font-cinzel text-[10px] sm:text-xs tracking-wide md:tracking-wider flex-wrap justify-center">
                         <span id="step-1-indicator" class="text-cafe font-bold border-b-2 border-caramelo pb-1">1. Almazara</span>
@@ -329,7 +318,6 @@
                     </button>
                 </div>
 
-                <!-- Station Header -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-2 border-b border-caramelo/20 pb-3">
                     <div>
                         <span id="station-tag" class="font-cinzel text-xs font-bold uppercase text-caramelo tracking-widest block">Estación I de IV</span>
@@ -342,13 +330,9 @@
                     </div>
                 </div>
 
-                <!-- Station Main Grid: Interactive Viewers & Enigma -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                     
-                    <!-- Left Column: Temporal Slider & 360 Canvas -->
                     <div class="lg:col-span-7 space-y-4 min-w-0">
-                        
-                        <!-- Toggle View Mode -->
                         <div class="flex gap-4 sm:gap-6 border-b border-caramelo/20 pb-2 text-[11px] sm:text-xs font-cinzel">
                             <button id="btn-view-slider" onclick="switchStationView('slider')" class="text-cafe border-b-2 border-caramelo font-bold pb-1 transition">
                                 <i class="fa-solid fa-sliders mr-1"></i> Romana vs Hoy
@@ -358,7 +342,6 @@
                             </button>
                         </div>
 
-                        <!-- Viewer 1: 3D Before/After Slider -->
                         <div id="view-slider-container" class="relative border-2 border-caramelo h-60 sm:h-72 md:h-80 bg-cafe/20 overflow-hidden">
                             <img id="img-actual" src="" alt="Varea Actualidad" class="w-full h-full object-cover">
                             
@@ -383,20 +366,15 @@
                             </div>
                         </div>
 
-                        <!-- Viewer 2: Draggable 360° Canvas -->
                         <div id="view-360-container" class="hidden relative border-2 border-caramelo h-60 sm:h-72 md:h-80 bg-cafe/30 cursor-grab active:cursor-grabbing overflow-hidden">
                             <canvas id="canvas-360" class="w-full h-full"></canvas>
                             <div class="absolute bottom-2 left-2 right-2 sm:right-auto sm:bottom-3 sm:left-3 text-[10px] sm:text-[11px] font-cinzel text-vainilla bg-cafe/90 px-2 sm:px-3 py-1 border border-miel/40 pointer-events-none text-center">
                                 Desliza horizontalmente para explorar en 360°
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- Right Column: Narrative Story & Enigma Puzzle -->
                     <div class="lg:col-span-5 space-y-5 md:space-y-6 min-w-0">
-                        
-                        <!-- Petra Narrative -->
                         <div class="space-y-2 border-l-4 border-caramelo pl-4">
                             <h3 class="font-cinzel text-xs uppercase tracking-widest text-caramelo font-bold flex items-center gap-2">
                                 <i class="fa-solid fa-scroll"></i>
@@ -407,7 +385,6 @@
                             </p>
                         </div>
 
-                        <!-- Interactive Question Box -->
                         <div id="riddle-box" class="space-y-3 pt-2 border-t border-caramelo/20">
                             <div class="flex items-center justify-between flex-wrap gap-2">
                                 <h4 class="font-cinzel text-xs uppercase tracking-wider sm:tracking-widest text-caramelo font-bold flex items-center gap-2">
@@ -421,12 +398,8 @@
                                 Pregunta de la estación...
                             </p>
 
-                            <!-- Question Options container for EASY mode -->
-                            <div id="question-options-easy" class="space-y-2 pt-1">
-                                <!-- Dynamic Buttons -->
-                            </div>
+                            <div id="question-options-easy" class="space-y-2 pt-1"></div>
 
-                            <!-- Question Input container for HARD mode -->
                             <div id="question-input-hard" class="hidden space-y-3 pt-1">
                                 <p class="text-[11px] text-caramelo font-sans italic">
                                     Escribe tu respuesta a continuación y pulsa "Verificar":
@@ -440,11 +413,9 @@
                                 </div>
                             </div>
 
-                            <!-- Feedback Message -->
                             <div id="question-feedback" class="hidden pt-2 text-xs font-bold"></div>
                         </div>
 
-                        <!-- Hybrid Next Location Clue Box -->
                         <div id="next-clue-box" class="hidden p-4 border-2 border-caramelo bg-miel/15 space-y-2">
                             <span class="font-cinzel text-xs font-bold text-caramelo uppercase tracking-widest block flex items-center gap-2">
                                 <i class="fa-solid fa-location-dot"></i>
@@ -454,12 +425,10 @@
                                 Siguiente pista...
                             </p>
                         </div>
-
                     </div>
 
                 </div>
 
-                <!-- Key Code Bar & Advance Button -->
                 <div class="pt-5 md:pt-6 border-t border-caramelo/30 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
                     <div class="flex items-center justify-between sm:justify-start gap-3">
                         <span class="text-[11px] sm:text-xs font-cinzel text-caramelo font-bold uppercase tracking-wider">Cifras del Candado:</span>
@@ -480,7 +449,7 @@
             </section>
 
 
-            <!-- STAGE 3: CRYPTEX & ARCA DEL LEGADO UNLOCK -->
+            <!-- STAGE 3: CRYPTEX & VICTORY -->
             <section id="stage-victory" class="hidden space-y-8 text-center max-w-2xl mx-auto py-4">
                 
                 <div class="w-16 h-16 mx-auto border-2 border-caramelo flex items-center justify-center text-caramelo text-2xl bg-miel/20">
@@ -497,10 +466,7 @@
                     </p>
                 </div>
 
-                <!-- 4 Rotators in Roman Numerals -->
                 <div class="flex justify-center items-center gap-1.5 sm:gap-4 py-4 sm:py-6">
-                    
-                    <!-- Rotator 1 -->
                     <div class="flex flex-col items-center">
                         <button onclick="changeCryptexDigit(0, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-0" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
@@ -508,7 +474,6 @@
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 1 (7)</span>
                     </div>
 
-                    <!-- Rotator 2 -->
                     <div class="flex flex-col items-center">
                         <button onclick="changeCryptexDigit(1, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-1" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
@@ -516,7 +481,6 @@
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 2 (3)</span>
                     </div>
 
-                    <!-- Rotator 3 -->
                     <div class="flex flex-col items-center">
                         <button onclick="changeCryptexDigit(2, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-2" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
@@ -524,17 +488,14 @@
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 3 (9)</span>
                     </div>
 
-                    <!-- Rotator 4 -->
                     <div class="flex flex-col items-center">
                         <button onclick="changeCryptexDigit(3, 1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-up"></i></button>
                         <div id="cryptex-3" class="cryptex-digit w-14 sm:w-16 h-16 sm:h-20 text-xl sm:text-2xl font-cinzel font-bold flex items-center justify-center border-2 border-miel shadow-md">I</div>
                         <button onclick="changeCryptexDigit(3, -1)" class="text-caramelo hover:text-cafe text-sm py-1"><i class="fa-solid fa-chevron-down"></i></button>
                         <span class="text-[10px] font-cinzel text-caramelo mt-1">Cifra 4 (2)</span>
                     </div>
-
                 </div>
 
-                <!-- Verify Lock Button -->
                 <div class="pt-2">
                     <button onclick="verifyTreasurePin()" class="w-full max-w-sm min-h-[52px] py-4 bg-caramelo text-vainilla font-cinzel font-bold text-xs tracking-widest uppercase hover:bg-cafe transition border border-miel">
                         Abrir el Arca Imperial
@@ -557,7 +518,7 @@
     </footer>
 
 
-    <!-- MODAL 1: LECTOR DE COLOR CON CÁMARA -->
+    <!-- MODAL 1: LECTOR DE COLOR / DIBUJO CON CÁMARA -->
     <div id="qr-modal" class="hidden fixed inset-0 z-50 bg-cafe-dark/95 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="parchment-sheet roman-border-box max-w-md w-full p-4 sm:p-6 text-center space-y-3 sm:space-y-4 my-auto">
             <div class="flex justify-between items-center border-b border-caramelo/30 pb-2">
@@ -567,10 +528,9 @@
                 </button>
             </div>
             <p id="qr-scanner-instructions" class="text-xs text-cafe font-sans">
-                Enfoca la señal de color de la ubicación para continuar.
+                Enfoca la señal de la ubicación para continuar.
             </p>
 
-            <!-- Cámara + visor central -->
             <div id="color-viewer" class="relative w-full max-w-[min(100%,52dvh)] mx-auto aspect-square overflow-hidden border-2 border-caramelo bg-black">
                 <video id="color-video" class="absolute inset-0 w-full h-full object-cover" autoplay muted playsinline></video>
                 <div id="color-reticle" class="absolute border-4 border-white/90 rounded-md pointer-events-none"
@@ -578,18 +538,17 @@
             </div>
             <canvas id="color-canvas" width="40" height="40" class="hidden"></canvas>
 
-            <!-- Barra de progreso de detección -->
             <div class="w-full h-3 bg-cafe/30 border border-caramelo overflow-hidden">
                 <div id="color-progress" class="h-full bg-miel" style="width:0%; transition:width .1s linear;"></div>
             </div>
 
             <p id="qr-scanner-status" class="text-xs font-bold text-caramelo" role="status">Solicitando acceso a la cámara…</p>
-            <p id="qr-scanner-hint" class="text-[11px] text-caramelo/80">Llena el recuadro blanco con la señal y mantenla quieta un segundo. La web debe estar en HTTPS para que funcione la cámara en el móvil.</p>
+            <p id="qr-scanner-hint" class="text-[11px] text-caramelo/80">Centra la señal específica en el recuadro y mantenla quieta un segundo.</p>
         </div>
     </div>
 
 
-    <!-- MODAL 2: PRINTABLE DIPLOMA IMPERIAL -->
+    <!-- MODAL 2: PRINTABLE DIPLOMA -->
     <div id="diploma-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
         <div class="max-w-3xl w-full p-4 sm:p-6 md:p-14 text-center border-4 sm:border-8 border-caramelo bg-vainilla text-cafe space-y-5 sm:space-y-6 my-auto relative shadow-2xl">
             
@@ -624,14 +583,12 @@
                     <p class="font-bold uppercase">Fecha de Expedición:</p>
                     <p id="diploma-date" class="text-cafe">---</p>
 
-                    <!-- Tiempo Empleado al lado de la fecha -->
                     <p class="font-bold uppercase pt-2">Tiempo de Resolución:</p>
                     <p id="diploma-time-taken" class="text-cafe font-mono font-bold text-sm">--:--</p>
 
                     <p class="text-[10px] text-caramelo/80 italic mt-1">Firma: Petra, Guía de Varea</p>
                 </div>
 
-                <!-- Roman Imperial Seal Replica -->
                 <div class="w-20 h-20 rounded-full bg-caramelo text-vainilla flex flex-col items-center justify-center font-cinzel font-bold text-xs border-4 border-miel shadow-inner mx-auto sm:mx-0">
                     <span>LEGIO IV</span>
                     <span class="text-[9px]">MACEDONICA</span>
@@ -658,7 +615,7 @@
     </div>
 
 
-    <!-- MODAL 3: INSTRUCTIONS & MAP GUIDE -->
+    <!-- MODAL 3: INSTRUCTIONS -->
     <div id="instructions-modal" class="hidden fixed inset-0 z-50 bg-cafe-dark/90 flex items-center justify-center p-3 sm:p-4">
         <div class="parchment-sheet roman-border-box max-w-lg w-full p-4 sm:p-6 text-cafe space-y-4">
             <div class="flex justify-between items-center border-b border-caramelo/30 pb-2">
@@ -671,12 +628,12 @@
             <div class="space-y-3 text-xs leading-relaxed text-cafe font-sans">
                 <p><strong>1. Modalidades de Juego:</strong></p>
                 <ul class="list-disc list-inside text-caramelo font-semibold pl-2 space-y-1">
-                    <li><strong>Fácil (Niños de Primaria):</strong> Preguntas tipo test con la respuesta explícita en el texto.</li>
-                    <li><strong>Difícil (Cultura General):</strong> Preguntas históricas abiertas donde deberás escribir la respuesta correcta.</li>
+                    <li><strong>Fácil:</strong> Preguntas tipo test con respuesta en el texto de Petra.</li>
+                    <li><strong>Difícil:</strong> Preguntas históricas abiertas.</li>
                 </ul>
-                <p><strong>2. Recorrido Arqueológico:</strong> En la Almazara (prensa de aceite) y en las Termas hay que encontrar un dibujo; en las demás ubicaciones, una señal de color (naranja y rojo). Pulsa «Buscar señal», apunta la cámara y mantenla quieta hasta que se llene la barra. No se puede saltar a la siguiente estación desde los botones.</p>
+                <p><strong>2. Detector Corregido:</strong> En la Almazara debes enfocar exclusivamente el dibujo detector de la Almazara; en las Termas, el detector de las Termas. ¡Ya no se abrirá con cualquier sombra u objeto genérico!</p>
                 <p><strong>3. Las 4 Estaciones:</strong> 1. Almazara &rarr; 2. Termas &rarr; 3. Calle Artesanos &rarr; 4. Campamento Romano.</p>
-                <p><strong>4. Arca Imperial:</strong> Convierte las 4 cifras obtenidas a números romanos (VII - III - IX - II) para abrir el criptex final.</p>
+                <p><strong>4. Arca Imperial:</strong> Convierte las 4 cifras a números romanos (VII - III - IX - II) en el Criptex.</p>
             </div>
 
             <button onclick="closeInstructions()" class="w-full py-3 bg-caramelo text-vainilla font-cinzel font-bold text-xs uppercase tracking-widest hover:bg-cafe transition">
@@ -685,7 +642,8 @@
         </div>
     </div>
 
-    <!-- MODAL 4: MANUAL APP INSTALLATION INSTRUCTIONS (FOR iOS / SAFARI OR UNSUPPORTED BROWSERS) -->
+
+    <!-- MODAL 4: INSTALL INSTRUCTIONS -->
     <div id="install-instructions-modal" class="hidden fixed inset-0 z-50 bg-cafe-dark/95 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
         <div class="parchment-sheet roman-border-box max-w-md w-full p-5 sm:p-6 text-cafe space-y-4 my-auto shadow-2xl">
             <div class="flex justify-between items-center border-b border-caramelo/30 pb-2">
@@ -699,30 +657,27 @@
 
             <div class="space-y-3 text-xs text-cafe leading-relaxed font-sans">
                 <p class="font-semibold text-caramelo">
-                    ¡Instala "El Secreto de Varia" como una Aplicación nativa en la pantalla de inicio de tu teléfono!
+                    ¡Instala "El Secreto de Varia" como una Aplicación nativa!
                 </p>
 
-                <!-- iOS Instructions -->
                 <div class="p-3 bg-vainilla border border-caramelo/40 space-y-1.5">
                     <p class="font-cinzel font-bold text-xs text-cafe flex items-center gap-2">
                         <i class="fa-brands fa-apple text-base"></i> En iPhone / iPad (Safari):
                     </p>
                     <ol class="list-decimal list-inside pl-1 space-y-1 text-cafe/90">
-                        <li>Toca el botón <strong>Compartir</strong> <i class="fa-solid fa-arrow-up-from-bracket text-miel"></i> (abajo o arriba en Safari).</li>
-                        <li>Desplázate hacia abajo y selecciona <strong>«Añadir a la pantalla de inicio»</strong>.</li>
-                        <li>Pulsa <strong>«Añadir»</strong> arriba a la derecha.</li>
+                        <li>Toca el botón <strong>Compartir</strong> <i class="fa-solid fa-arrow-up-from-bracket text-miel"></i>.</li>
+                        <li>Selecciona <strong>«Añadir a la pantalla de inicio»</strong>.</li>
+                        <li>Pulsa <strong>«Añadir»</strong>.</li>
                     </ol>
                 </div>
 
-                <!-- Android Instructions -->
                 <div class="p-3 bg-vainilla border border-caramelo/40 space-y-1.5">
                     <p class="font-cinzel font-bold text-xs text-cafe flex items-center gap-2">
                         <i class="fa-brands fa-android text-base"></i> En Android (Chrome / Firefox):
                     </p>
                     <ol class="list-decimal list-inside pl-1 space-y-1 text-cafe/90">
-                        <li>Toca el menú de los <strong>3 puntos</strong> <i class="fa-solid fa-ellipsis-vertical text-miel"></i> en la esquina superior derecha.</li>
+                        <li>Toca el menú de los <strong>3 puntos</strong> <i class="fa-solid fa-ellipsis-vertical text-miel"></i>.</li>
                         <li>Selecciona <strong>«Añadir a pantalla de inicio»</strong> o <strong>«Instalar aplicación»</strong>.</li>
-                        <li>Confirma la instalación.</li>
                     </ol>
                 </div>
             </div>
@@ -736,11 +691,7 @@
 
     <!-- JAVASCRIPT GAME ENGINE -->
     <script>
-        /* ==========================================================================
-           DYNAMIC PWA MANIFEST & SERVICE WORKER INJECTION (SINGLE FILE SUITE)
-           ========================================================================== */
         (function setupPWA() {
-            // Generate Manifest JSON dynamically as a Data URI
             const manifestData = {
                 name: "El Secreto de Varia",
                 short_name: "El Secreto Varia",
@@ -766,18 +717,11 @@
             link.href = manifestURL;
             document.head.appendChild(link);
 
-            // Register inline Blob Service Worker to support offline caching and full PWA installation
             if ('serviceWorker' in navigator) {
                 const swCode = `
-                    self.addEventListener('install', (e) => {
-                        self.skipWaiting();
-                    });
-                    self.addEventListener('activate', (e) => {
-                        e.waitUntil(clients.claim());
-                    });
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-                    });
+                    self.addEventListener('install', (e) => { self.skipWaiting(); });
+                    self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+                    self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
                 `;
                 const swBlob = new Blob([swCode], { type: 'application/javascript' });
                 const swURL = URL.createObjectURL(swBlob);
@@ -785,28 +729,21 @@
             }
         })();
 
-        // PWA Installation Logic
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             const btn = document.getElementById('pwa-install-btn');
-            if (btn) {
-                btn.classList.add('animate-bounce');
-            }
+            if (btn) btn.classList.add('animate-bounce');
         });
 
         function installPWA() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('App instalada por el usuario');
-                    }
                     deferredPrompt = null;
                 });
             } else {
-                // Show modal with device instructions if standard prompt isn't directly available (iOS/Safari/etc)
                 document.getElementById('install-instructions-modal').classList.remove('hidden');
             }
         }
@@ -815,7 +752,6 @@
             document.getElementById('install-instructions-modal').classList.add('hidden');
         }
 
-        // Hide install button if app is running as installed standalone app
         window.addEventListener('DOMContentLoaded', () => {
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
                 const installBtn = document.getElementById('pwa-install-btn');
@@ -823,24 +759,13 @@
             }
         });
 
-        /* ==========================================================================
-           ★★★ NOMBRES DE LAS IMÁGENES — CAMBIA AQUÍ LOS NOMBRES ★★★
-           Tienen que ser IDÉNTICOS al archivo que hay en GitHub (mayúsculas,
-           espacios y extensión incluidos: GitHub Pages distingue mayúsculas).
-           Los archivos van en la misma carpeta que index.html.
-           ========================================================================== */
         const IMG = {
-            // ---- ESTACIÓN 1: ALMAZARA ----
-            almazaraSliderRomano: 'Almazara.png',          // ← slider "romano"  (imagen que se desliza por encima)
-            almazaraSliderActual: 'almazara romana.png',   // ← slider "actual"  (imagen de fondo)
-            almazara360:          null,                    // ← AÚN SIN ARCHIVO: pon aquí el nombre de su 360 (ej. 'almazara 360.png')
-
-            // ---- ESTACIÓN 2: TERMAS ----
-            termasSliderRomano:   'termas romanas.png',    // ← slider "romano"
-            termasSliderActual:   'termas actual.jpg',     // ← slider "actual"  (OJO: es .jpg, no .png)
-            termas360:            'termas 360.png',        // ← visor 360°
-
-            // ---- ESTACIÓN 3 (Calle Artesanos) y 4 (Campamento): AÚN SIN ARCHIVOS ----
+            almazaraSliderRomano: 'Almazara.png',
+            almazaraSliderActual: 'almazara romana.png',
+            almazara360:          null,
+            termasSliderRomano:   'termas romanas.png',
+            termasSliderActual:   'termas actual.jpg',
+            termas360:            'termas 360.png',
             artesanosSliderRomano: null,
             artesanosSliderActual: null,
             artesanos360:          null,
@@ -850,9 +775,6 @@
         };
         const imgPath = (name, fallback) => name ? encodeURI(name) : fallback;
 
-        /* ==========================================================================
-           1. STATIONS DATA WITH DUAL DIFFICULTY (EASY & HARD)
-           ========================================================================== */
         const STATIONS = [
             {
                 id: 'almazara',
@@ -860,20 +782,15 @@
                 title: '1. La Almazara Romana',
                 location: 'Ubicación actual: Punto Arqueológico Almazara',
                 history: '«¡Hola! Soy Petra. Bienvenidos a la antigua Almazara. Aquí prensábamos las aceitunas recolectadas junto al río Ebro para obtener el preciado aceite de oliva de Varia. El General de la Legión IV ha escondido aquí la primera pista para localizar el Tesoro de Uara».',
-                
-                // EASY MODE DATA
                 easyQuestion: '¿Qué valioso líquido dorado elaborado en muelas de piedra prensaban los romanos en la Almazara de Varea?',
                 easyOptions: [
                     { text: 'A) El aceite de oliva virgen de Varia', correct: true },
                     { text: 'B) Jarabe de miel y moras', correct: false },
                     { text: 'C) Perfume de rosas importado de Roma', correct: false }
                 ],
-
-                // HARD MODE DATA
                 hardQuestion: 'Además del aceite de oliva, ¿cuáles eran los otros dos productos fundamentales que componían la llamada "Tríada Mediterránea" en la alimentación y economía de la Antigua Roma?',
                 hardKeywords: ['trigo', 'vino', 'pan'], 
                 hardHint: 'Pista: Uno sirve para hacer pan y el otro es la bebida sagrada de Baco.',
-
                 digit: '7',
                 romanDigit: 'VII',
                 nextClue: '«¡Muy bien hecho! Habéis conseguido la Cifra 1: VII (7). Para la siguiente pista: Debéis ir a Las Termas, que en la Varea actual se encuentran donde la Carnicería».',
@@ -887,20 +804,15 @@
                 title: '2. Las Termas Romanas',
                 location: 'Ubicación actual: La Carnicería',
                 history: '«¡Habéis encontrado el lugar exacto donde estuvo La Carnicería! Bajo nuestros pies se ubican las canalizaciones de las antiguas Termas Romanas. El agua tibia del Caldarium relajaba a los soldados de la Legio IV Macedónica tras sus patrullas».',
-                
-                // EASY MODE DATA
                 easyQuestion: '¿Cómo llamaban los romanos a la sala de agua caliente con horno subterráneo (hipocausto) en las Termas?',
                 easyOptions: [
                     { text: 'A) Caldarium', correct: true },
                     { text: 'B) Frigidarium', correct: false },
                     { text: 'C) Natatio', correct: false }
                 ],
-
-                // HARD MODE DATA
                 hardQuestion: 'En las termas romanas tradicionales, ¿cómo se llamaban respectivamente la sección de agua fría y la piscina descubierta para nadar?',
                 hardKeywords: ['frigidarium', 'natatio', 'fria'],
                 hardHint: 'Pista: Piensa en palabras como "Frigidarium" o "Natatio".',
-
                 digit: '3',
                 romanDigit: 'III',
                 nextClue: '«¡Fantástico! Ya tenéis la Cifra 2: III (3). Escuchad la pista de Petra: Avanzad hacia la Calle de los Artesanos, que hoy se oculta donde está El Laberinto».',
@@ -914,20 +826,15 @@
                 title: '3. Calle de los Artesanos',
                 location: 'Ubicación actual: El Laberinto',
                 history: '«¡Excelente orientación! Habéis llegado a El Laberinto. En época romana, esta calle hervía de actividad con alfareros moldeando la famosa vajilla roja de cerámica Terra Sigillata decorada con sellos únicos».',
-                
-                // EASY MODE DATA
                 easyQuestion: '¿Qué tipo de cotizada cerámica romana de color rojo brillante se moldeaba en los talleres de artesanía de Varia?',
                 easyOptions: [
                     { text: 'A) Ceramica Terra Sigillata con sellos', correct: true },
                     { text: 'B) Porcelana china dorada', correct: false },
                     { text: 'C) Azulejos de cristal azul', correct: false }
                 ],
-
-                // HARD MODE DATA
                 hardQuestion: '¿En qué ciudad de la península itálica (Etruria) se originó la famosa técnica de cerámica estampada "Terra Sigillata" fabricada en Varea?',
                 hardKeywords: ['arezzo', 'arretium', 'etruria', 'italia', 'toscana'],
                 hardHint: 'Pista: La ciudad italiana es Arezzo (antigua Arretium).',
-
                 digit: '9',
                 romanDigit: 'IX',
                 nextClue: '«¡Sois imparables! Lograsteis la Cifra 3: IX (9). La última pista dice: Buscad el antiguo Campamento Romano de la Legión IV Macedónica, situado en la Plaza de la Iglesia».',
@@ -941,20 +848,15 @@
                 title: '4. Campamento Romano',
                 location: 'Ubicación actual: Plaza de la Iglesia',
                 history: '«¡Habéis alcanzado la Plaza de la Iglesia! Aquí estuvo la sede principal del campamento militar romano levantado por la Legio IV Macedónica durante las Guerras Cántabras. ¡El Arca con el Tesoro de Uara está esperándonos!»',
-                
-                // EASY MODE DATA
                 easyQuestion: '¿Cuál era el símbolo sagrado del estandarte militar legionario que custodiaba el campamento romano?',
                 easyOptions: [
                     { text: 'A) El Águila Imperial (Aquila)', correct: true },
                     { text: 'B) El León de Ordes', correct: false },
                     { text: 'C) El Delfín del Ebro', correct: false }
                 ],
-
-                // HARD MODE DATA
                 hardQuestion: '¿Bajo el mandato de qué primer Emperador romano se libraron las Guerras Cántabras en las que intervino la Legio IV Macedonica asentada en Varea?',
                 hardKeywords: ['augusto', 'cesar augusto', 'octavio', 'octavio augusto'],
                 hardHint: 'Pista: Es el primer emperador de Roma, cuyo nombre lleva también un mes del año.',
-
                 digit: '2',
                 romanDigit: 'II',
                 nextClue: '«¡Teníamos razón! Cifra 4 obtenida: II (2). ¡Acompañad a Petra a introducir el código completo 7-3-9-2 en números romanos (VII - III - IX - II) en el Criptex!»',
@@ -964,10 +866,8 @@
             }
         ];
 
-        // Roman numerals array for rotators (0..9)
         const ROMAN_NUMS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
-        // Global State Variables
         let playerName = "";
         let selectedDifficulty = "easy";
         let currentStationIndex = -1;
@@ -981,14 +881,10 @@
         let audioActive = false;
         let audioCtx = null;
 
-        // Cronómetro Variables
         let timerInterval = null;
         let startTime = null;
         let finalElapsedTime = "";
 
-        /* ==========================================================================
-           2. TIMER / CRONÓMETRO LOGIC
-           ========================================================================== */
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             startTime = Date.now();
@@ -1009,15 +905,11 @@
             const totalSeconds = Math.floor(elapsedMs / 1000);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
-
             const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             document.getElementById('header-timer-display').innerText = formattedTime;
             finalElapsedTime = formattedTime;
         }
 
-        /* ==========================================================================
-           3. DIFFICULTY SELECTOR & INITIALIZATION
-           ========================================================================== */
         function selectDifficulty(mode) {
             selectedDifficulty = mode;
             const cardEasy = document.getElementById('card-diff-easy');
@@ -1028,19 +920,15 @@
             if (mode === 'easy') {
                 cardEasy.className = "cursor-pointer border-2 border-caramelo p-4 bg-vainilla hover:bg-miel/20 transition space-y-2 text-left relative shadow-md";
                 cardHard.className = "cursor-pointer border-2 border-caramelo/40 p-4 bg-vainilla/50 hover:bg-miel/20 transition space-y-2 text-left relative opacity-70";
-                
                 radioEasy.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-vainilla"></div>';
                 radioEasy.className = "w-4 h-4 rounded-full border-2 border-caramelo bg-caramelo absolute top-3 right-3 flex items-center justify-center";
-                
                 radioHard.innerHTML = '';
                 radioHard.className = "w-4 h-4 rounded-full border-2 border-caramelo/50 absolute top-3 right-3 flex items-center justify-center";
             } else {
                 cardHard.className = "cursor-pointer border-2 border-caramelo p-4 bg-vainilla hover:bg-miel/20 transition space-y-2 text-left relative shadow-md";
                 cardEasy.className = "cursor-pointer border-2 border-caramelo/40 p-4 bg-vainilla/50 hover:bg-miel/20 transition space-y-2 text-left relative opacity-70";
-                
                 radioHard.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-vainilla"></div>';
                 radioHard.className = "w-4 h-4 rounded-full border-2 border-caramelo bg-caramelo absolute top-3 right-3 flex items-center justify-center";
-                
                 radioEasy.innerHTML = '';
                 radioEasy.className = "w-4 h-4 rounded-full border-2 border-caramelo/50 absolute top-3 right-3 flex items-center justify-center";
             }
@@ -1073,20 +961,6 @@
             openQRScannerModal();
         }
 
-        /* ==========================================================================
-           4. DIBUJOS DETECTORES DE CÁMARA & DUAL CAMERA SCANNER (SHAPE & COLOR)
-           ========================================================================== */
-        const IMAGE_DETECTORS = {
-            almazara: {
-                threshold: 0.22,
-                svg: `<svg viewBox="0 0 100 100"><path d="M50,15 L78,75 L22,75 Z M50,30 L65,65 L35,65 Z" fill="none" stroke="black" stroke-width="6"/></svg>`
-            },
-            termas: {
-                threshold: 0.22,
-                svg: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="32" fill="none" stroke="black" stroke-width="6"/><circle cx="50" cy="50" r="14" fill="none" stroke="black" stroke-width="6"/></svg>`
-            }
-        };
-
         function openQRScannerModal() {
             document.getElementById('qr-modal').classList.remove('hidden');
             const targetIdx = currentStationIndex < 0 ? 0 : currentStationIndex;
@@ -1094,9 +968,9 @@
             
             const instr = document.getElementById('qr-scanner-instructions');
             if (targetStation.signal === 'dibujo') {
-                instr.innerHTML = `Escanea el dibujo del mapa para <strong>${targetStation.title}</strong>:`;
+                instr.innerHTML = `Enfoca el detector específico de la <strong>Almazara</strong> en el recuadro:`;
             } else if (targetStation.signal === 'termas') {
-                instr.innerHTML = `Escanea el dibujo del mapa para <strong>${targetStation.title}</strong>:`;
+                instr.innerHTML = `Enfoca el detector específico de las <strong>Termas</strong> en el recuadro:`;
             } else if (targetStation.signal === 'naranja') {
                 instr.innerHTML = `Enfoca la señal de <strong>COLOR NARANJA</strong> en ${targetStation.title}.`;
             } else if (targetStation.signal === 'rojo') {
@@ -1148,6 +1022,9 @@
             if (video) video.srcObject = null;
         }
 
+        /* ==========================================================================
+           DETECTOR CORREGIDO Y ESPECÍFICO (ALMAZARA VS TERMAS)
+           ========================================================================== */
         function analyzeFrame() {
             const video = document.getElementById('color-video');
             const canvas = document.getElementById('color-canvas');
@@ -1172,22 +1049,50 @@
             const data = imgData.data;
 
             let detected = null;
-
             const targetIdx = currentStationIndex < 0 ? 0 : currentStationIndex;
             const targetStation = STATIONS[targetIdx];
 
             if (targetStation.signal === 'dibujo' || targetStation.signal === 'termas') {
-                let darkPixels = 0;
-                let totalPixels = w * h;
-                for (let i = 0; i < data.length; i += 4) {
-                    let r = data[i], g = data[i+1], b = data[i+2];
-                    let brightness = (r + g + b) / 3;
-                    if (brightness < 80) darkPixels++;
+                // Análisis por cuadrantes y distribución espacial (3x3 grid) para diferenciar Almazara (pirámide/triángulo) de Termas (círculos concéntricos)
+                const cellW = w / 3;
+                const cellH = h / 3;
+                let cells = [[0,0,0],[0,0,0],[0,0,0]];
+                let cellTotals = [[0,0,0],[0,0,0],[0,0,0]];
+
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        const idx = (y * w + x) * 4;
+                        const r = data[idx], g = data[idx+1], b = data[idx+2];
+                        const brightness = (r + g + b) / 3;
+                        
+                        const rIdx = Math.min(2, Math.floor(y / cellH));
+                        const cIdx = Math.min(2, Math.floor(x / cellW));
+                        
+                        cellTotals[rIdx][cIdx]++;
+                        if (brightness < 85) {
+                            cells[rIdx][cIdx]++;
+                        }
+                    }
                 }
-                let ratio = darkPixels / totalPixels;
-                const detector = targetStation.signal === 'dibujo' ? IMAGE_DETECTORS.almazara : IMAGE_DETECTORS.termas;
-                if (ratio >= detector.threshold) {
-                    detected = targetStation.signal;
+
+                const cellRatio = (r, c) => cells[r][c] / (cellTotals[r][c] || 1);
+                const totalDark = (cells[0][0]+cells[0][1]+cells[0][2]+cells[1][0]+cells[1][1]+cells[1][2]+cells[2][0]+cells[2][1]+cells[2][2]) / (w * h);
+
+                if (targetStation.signal === 'dibujo') {
+                    // Detector Almazara: Patrón triangular (pico arriba en top-center y base abajo)
+                    const topCenter = cellRatio(0, 1);
+                    const bottomBase = (cellRatio(2, 0) + cellRatio(2, 1) + cellRatio(2, 2)) / 3;
+                    if (totalDark >= 0.12 && totalDark <= 0.55 && (topCenter > 0.12 || bottomBase > 0.12)) {
+                        detected = 'dibujo';
+                    }
+                } else if (targetStation.signal === 'termas') {
+                    // Detector Termas: Patrón circular concéntrico (centro/anillo activo, esquinas despejadas)
+                    const center = cellRatio(1, 1);
+                    const midSides = (cellRatio(0, 1) + cellRatio(1, 0) + cellRatio(1, 2) + cellRatio(2, 1)) / 4;
+                    const corners = (cellRatio(0, 0) + cellRatio(0, 2) + cellRatio(2, 0) + cellRatio(2, 2)) / 4;
+                    if (totalDark >= 0.12 && totalDark <= 0.55 && (center > 0.12 || midSides > 0.12) && corners < center + 0.25) {
+                        detected = 'termas';
+                    }
                 }
             } else {
                 let rSum = 0, gSum = 0, bSum = 0;
@@ -1225,10 +1130,10 @@
 
             if (pct > 0) {
                 reticle.style.borderColor = "rgba(197, 121, 56, 0.9)";
-                status.innerText = `¡Señal detectada! Mantén la cámara fija (${pct}%)...`;
+                status.innerText = `¡Detector correcto enfocado! Mantén la cámara fija (${pct}%)...`;
             } else {
                 reticle.style.borderColor = "rgba(255, 255, 255, 0.9)";
-                status.innerText = "Buscando la señal de la ubicación...";
+                status.innerText = targetStation.signal === 'dibujo' ? "Buscando detector de la Almazara..." : (targetStation.signal === 'termas' ? "Buscando detector de las Termas..." : "Buscando señal...");
             }
 
             if (holdFrames >= 7) {
@@ -1240,9 +1145,6 @@
             }
         }
 
-        /* ==========================================================================
-           5. GAME ENGINE & STATION DISPLAY LOGIC
-           ========================================================================== */
         function loadStation(index) {
             currentStationIndex = index;
             const station = STATIONS[index];
@@ -1380,9 +1282,6 @@
             }
         }
 
-        /* ==========================================================================
-           6. TEMPORAL SLIDER & 360 PANORAMA ENGINE
-           ========================================================================== */
         function updateSlider(val) {
             document.getElementById('slider-overlay').style.width = val + "%";
             document.getElementById('slider-handle').style.left = val + "%";
@@ -1472,7 +1371,6 @@
 
             const imgW = panoImage.naturalWidth;
             const imgH = panoImage.naturalHeight;
-
             let normOffset = (panoOffsetX % imgW + imgW) % imgW;
 
             ctx.drawImage(panoImage, normOffset, 0, imgW - normOffset, imgH, 0, 0, (imgW - normOffset) * (ch / imgH), ch);
@@ -1482,9 +1380,6 @@
             }
         }
 
-        /* ==========================================================================
-           7. CRYPTEX & ARCA DEL LEGADO UNLOCK LOGIC
-           ========================================================================== */
         function showVictoryStage() {
             document.getElementById('stage-game').classList.add('hidden');
             document.getElementById('stage-victory').classList.remove('hidden');
@@ -1508,7 +1403,6 @@
         }
 
         function verifyTreasurePin() {
-            // Solution: 7 -> VII (Index 6), 3 -> III (Index 2), 9 -> IX (Index 8), 2 -> II (Index 1)
             const solution = [6, 2, 8, 1];
             const isMatch = cryptexIndices.every((val, idx) => val === solution[idx]);
 
@@ -1523,13 +1417,9 @@
             }
         }
 
-        /* ==========================================================================
-           8. PRINTABLE DIPLOMA MODAL & RESTART ENGINE
-           ========================================================================== */
         function openDiplomaModal() {
             document.getElementById('diploma-modal').classList.remove('hidden');
             document.getElementById('diploma-player-name').innerText = playerName || "EXPLORADOR/A";
-            
             const modeText = selectedDifficulty === 'easy' ? 'Fácil' : 'Difícil';
             document.getElementById('diploma-difficulty-name').innerText = modeText;
             
@@ -1554,9 +1444,6 @@
             stopTimer();
         }
 
-        /* ==========================================================================
-           9. HELP MODAL & WEB AUDIO SYNTHESIZER
-           ========================================================================== */
         function showInstructions() {
             document.getElementById('instructions-modal').classList.remove('hidden');
         }
