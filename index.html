@@ -933,50 +933,291 @@
         }
 
         /* ==========================================================================
-           4. 360 PANORAMA CANVAS VIEWER
+           4. VISOR 360° (canvas, sin librerías externas)
+           - initViewers360(): prepara el visor (una sola vez), lo ajusta al tamaño
+             visible y lo pinta. Se llama al abrir la pestaña «Visor 360°».
+           - loadPanoImage(url): carga el panorama de la estación actual.
+           - drawPano(): redibuja el visor.
+           Arrastra para girar, rueda / pellizco para zoom, doble clic para reiniciar.
            ========================================================================== */
-        let panoImg = null, panoYaw = 0;
+        const viewer360 = {
+            box: null, canvas: null, ctx: null, bound: false,
+            url: null, img: null, status: 'empty',   // empty | loading | ready | error
+            mode: 'flat',                            // sphere (equirectangular) | flat (foto normal en bucle)
+            src32: null, srcW: 0, srcH: 0, vcov: Math.PI,
+            out: null, out32: null,
+            yaw: 0, pitch: 0, fov: 80,
+            dirty: true, running: false, raf: 0,
+            dragging: false, lastInteraction: 0,
+            pointers: new Map(), pinchDist: 0
+        };
+        const V360_MIN_FOV = 35, V360_MAX_FOV = 90, V360_BG = 0xFF121D2B; // #2b1d12 en ABGR
+
         function loadPanoImage(url) {
-            panoImg = null;
-            if (!url) { drawPano(); return; }
-            const im = new Image();
-            im.onload = () => { panoImg = im; panoYaw = 0; drawPano(); };
-            im.onerror = () => { panoImg = null; drawPano(); };
-            im.src = url;
-        }
-        function drawPano() {
-            const canvas = document.getElementById('canvas-360');
-            const box = document.getElementById('view-360-container');
-            if (!canvas || !box) return;
-            const w = box.clientWidth, h = box.clientHeight;
-            if (!w || !h) return;
-            const dpr = window.devicePixelRatio || 1;
-            if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-                canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+            const v = viewer360;
+            if (url && url === v.url && (v.status === 'ready' || v.status === 'loading')) {
+                v.dirty = true;
+                return;
             }
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#1a1209'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            if (!panoImg) return;
-            const scale = canvas.height / panoImg.height;
-            const iw = panoImg.width * scale;
-            let x = -(((panoYaw % iw) + iw) % iw);
-            for (; x < canvas.width; x += iw) ctx.drawImage(panoImg, x, 0, iw, canvas.height);
+            v.url = url || null;
+            v.img = null;
+            v.src32 = null;
+            v.yaw = 0; v.pitch = 0; v.fov = 80; v.lastInteraction = 0;
+            v.dirty = true;
+            if (!url) {
+                v.status = 'empty';
+                start360Loop();
+                return;
+            }
+            v.status = 'loading';
+            start360Loop();
+            const token = url;
+            const attempt = (withCors) => {
+                const img = new Image();
+                if (withCors) img.crossOrigin = 'anonymous';
+                img.onload = () => { if (v.url === token) prepare360Source(img); };
+                img.onerror = () => {
+                    if (v.url !== token) return;
+                    if (withCors) { attempt(false); return; }  // reintento sin CORS (p. ej. abierto como archivo)
+                    v.status = 'error';
+                    v.dirty = true;
+                    start360Loop();
+                };
+                img.src = url;
+            };
+            attempt(true);
         }
-        (function setupPanoDrag() {
-            const box = document.getElementById('view-360-container');
-            if (!box) return;
-            let dragging = false, lastX = 0;
-            box.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; try { box.setPointerCapture(e.pointerId); } catch (_) {} });
-            box.addEventListener('pointermove', e => {
-                if (!dragging) return;
-                panoYaw -= (e.clientX - lastX) * (window.devicePixelRatio || 1);
-                lastX = e.clientX; drawPano();
+
+        function prepare360Source(img) {
+            const v = viewer360;
+            v.img = img;
+            v.mode = 'flat';
+            const ratio = img.naturalWidth / img.naturalHeight;
+            // Panorama equirectangular (≈2:1 o más ancho) → proyección esférica real.
+            // Foto normal → desplazamiento horizontal en bucle.
+            if (ratio >= 1.9) {
+                try {
+                    const sw = Math.min(img.naturalWidth, 2048);
+                    const sh = Math.max(2, Math.round(sw / ratio));
+                    const off = document.createElement('canvas');
+                    off.width = sw; off.height = sh;
+                    const octx = off.getContext('2d', { willReadFrequently: true });
+                    octx.drawImage(img, 0, 0, sw, sh);
+                    const data = octx.getImageData(0, 0, sw, sh);   // falla si el canvas queda "tainted"
+                    v.src32 = new Uint32Array(data.data.buffer);
+                    v.srcW = sw; v.srcH = sh;
+                    v.vcov = Math.min(Math.PI, (2 * Math.PI) / ratio);  // cobertura vertical en radianes
+                    v.mode = 'sphere';
+                } catch (e) {
+                    v.mode = 'flat';
+                }
+            }
+            v.status = 'ready';
+            v.dirty = true;
+            start360Loop();
+        }
+
+        function fit360() {
+            const v = viewer360;
+            if (!v.box || !v.canvas) return false;
+            const cw = v.box.clientWidth, ch = v.box.clientHeight;
+            if (!cw || !ch) return false;
+            let rw, rh;
+            if (v.status === 'ready' && v.mode === 'sphere') {
+                rw = Math.min(cw, 720);
+                rh = Math.max(1, Math.round(rw * ch / cw));
+            } else {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                rw = Math.round(cw * dpr);
+                rh = Math.round(ch * dpr);
+            }
+            if (v.canvas.width !== rw || v.canvas.height !== rh) {
+                v.canvas.width = rw;
+                v.canvas.height = rh;
+                v.out = null; v.out32 = null;
+            }
+            if (v.mode === 'sphere' && v.status === 'ready' && !v.out) {
+                v.out = v.ctx.createImageData(rw, rh);
+                v.out32 = new Uint32Array(v.out.data.buffer);
+            }
+            return true;
+        }
+
+        function clamp360() {
+            const v = viewer360;
+            v.fov = Math.max(V360_MIN_FOV, Math.min(V360_MAX_FOV, v.fov));
+            const maxPitch = v.mode === 'sphere' ? Math.min(85 * Math.PI / 180, v.vcov / 2) : 70 * Math.PI / 180;
+            v.pitch = Math.max(-maxPitch, Math.min(maxPitch, v.pitch));
+            const twoPi = Math.PI * 2;
+            if (v.yaw > Math.PI) v.yaw -= twoPi;
+            if (v.yaw < -Math.PI) v.yaw += twoPi;
+        }
+
+        function render360Sphere() {
+            const v = viewer360;
+            const rw = v.canvas.width, rh = v.canvas.height;
+            const out32 = v.out32, src32 = v.src32, srcW = v.srcW, srcH = v.srcH, vcov = v.vcov;
+            const f = (rw / 2) / Math.tan(v.fov * Math.PI / 360);
+            const cp = Math.cos(v.pitch), sp = Math.sin(v.pitch);
+            const cy = Math.cos(v.yaw), sy = Math.sin(v.yaw);
+            const twoPi = Math.PI * 2;
+            let idx = 0;
+            for (let j = 0; j < rh; j++) {
+                const y = rh / 2 - j - 0.5;
+                const y1 = y * cp + f * sp;      // no depende de la columna
+                const z1 = -y * sp + f * cp;
+                for (let i = 0; i < rw; i++) {
+                    const x = i - rw / 2 + 0.5;
+                    const x2 = x * cy + z1 * sy;
+                    const z2 = -x * sy + z1 * cy;
+                    const lon = Math.atan2(x2, z2);
+                    const lat = Math.atan2(y1, Math.sqrt(x2 * x2 + z2 * z2));
+                    const vv = 0.5 - lat / vcov;
+                    if (vv < 0 || vv >= 1) { out32[idx++] = V360_BG; continue; }
+                    let sx = ((lon / twoPi + 0.5) * srcW) | 0;
+                    if (sx >= srcW) sx = srcW - 1;
+                    out32[idx++] = src32[((vv * srcH) | 0) * srcW + sx];
+                }
+            }
+            v.ctx.putImageData(v.out, 0, 0);
+        }
+
+        function render360Flat() {
+            const v = viewer360;
+            const ctx = v.ctx, w = v.canvas.width, h = v.canvas.height, img = v.img;
+            const twoPi = Math.PI * 2;
+            const z = 90 / v.fov;                                   // zoom ≥ 1
+            const dh = h * z;
+            const dw = img.naturalWidth * (dh / img.naturalHeight);
+            const pn = Math.max(-1, Math.min(1, v.pitch / (70 * Math.PI / 180)));
+            const y = (h - dh) / 2 + pn * (dh - h) / 2;
+            let x0 = w / 2 - (v.yaw / twoPi + 0.5) * dw;
+            x0 = ((x0 % dw) - dw) % dw;                             // (-dw, 0]
+            ctx.fillStyle = '#2b1d12';
+            ctx.fillRect(0, 0, w, h);
+            for (let x = x0; x < w; x += dw) ctx.drawImage(img, x, y, dw, dh);
+        }
+
+        function render360Message(text) {
+            const v = viewer360;
+            const ctx = v.ctx, w = v.canvas.width, h = v.canvas.height;
+            ctx.fillStyle = '#2b1d12';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#f5ecd5';
+            ctx.font = Math.max(12, Math.round(h * 0.07)) + 'px Cinzel, Georgia, serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, w / 2, h / 2);
+        }
+
+        function render360() {
+            const v = viewer360;
+            if (!v.canvas || !v.ctx || v.box.classList.contains('hidden')) return;
+            if (!fit360()) return;
+            if (v.status === 'loading') render360Message('Cargando vista 360°…');
+            else if (v.status === 'error') render360Message('No se pudo cargar la imagen 360°');
+            else if (v.status !== 'ready') render360Message('Sin imagen 360° para esta estación');
+            else if (v.mode === 'sphere') render360Sphere();
+            else render360Flat();
+        }
+
+        function tick360() {
+            const v = viewer360;
+            v.raf = 0;
+            if (!v.box || v.box.classList.contains('hidden')) { v.running = false; return; }
+            if (v.status === 'ready' && !v.dragging && performance.now() - v.lastInteraction > 2500) {
+                v.yaw += 0.0012;                 // giro lento automático hasta que el jugador lo toque
+                clamp360();
+                v.dirty = true;
+            }
+            if (v.dirty) { v.dirty = false; render360(); }
+            v.raf = requestAnimationFrame(tick360);
+        }
+
+        function start360Loop() {
+            const v = viewer360;
+            if (!v.canvas || v.running) return;
+            v.running = true;
+            v.raf = requestAnimationFrame(tick360);
+        }
+
+        function bind360Events() {
+            const v = viewer360;
+            if (v.bound) return;
+            v.bound = true;
+            const c = v.canvas;
+            const touch = () => { v.lastInteraction = performance.now(); v.dirty = true; };
+
+            c.addEventListener('pointerdown', (e) => {
+                c.setPointerCapture(e.pointerId);
+                v.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                v.dragging = true;
+                if (v.pointers.size === 2) {
+                    const [a, b] = [...v.pointers.values()];
+                    v.pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
+                }
+                touch();
             });
-            const end = () => { dragging = false; };
-            box.addEventListener('pointerup', end);
-            box.addEventListener('pointercancel', end);
-            window.addEventListener('resize', drawPano);
-        })();
+            c.addEventListener('pointermove', (e) => {
+                const p = v.pointers.get(e.pointerId);
+                if (!p) return;
+                if (v.pointers.size === 2) {
+                    p.x = e.clientX; p.y = e.clientY;
+                    const [a, b] = [...v.pointers.values()];
+                    const d = Math.hypot(a.x - b.x, a.y - b.y);
+                    if (v.pinchDist > 0 && d > 0) v.fov *= v.pinchDist / d;
+                    v.pinchDist = d;
+                } else {
+                    const k = (v.fov * Math.PI / 180) / Math.max(1, v.box.clientWidth);
+                    v.yaw -= (e.clientX - p.x) * k;
+                    v.pitch += (e.clientY - p.y) * k;
+                    p.x = e.clientX; p.y = e.clientY;
+                }
+                clamp360();
+                touch();
+            });
+            const end = (e) => {
+                v.pointers.delete(e.pointerId);
+                v.dragging = v.pointers.size > 0;
+                v.pinchDist = 0;
+                touch();
+            };
+            c.addEventListener('pointerup', end);
+            c.addEventListener('pointercancel', end);
+            c.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                v.fov += e.deltaY * 0.05;
+                clamp360();
+                touch();
+            }, { passive: false });
+            c.addEventListener('dblclick', () => {
+                v.yaw = 0; v.pitch = 0; v.fov = 80;
+                touch();
+            });
+            window.addEventListener('resize', () => { v.dirty = true; });
+            if (window.ResizeObserver) new ResizeObserver(() => { v.dirty = true; }).observe(v.box);
+        }
+
+        // Punto de entrada: se llama cada vez que se muestra la pestaña «Visor 360°».
+        function initViewers360() {
+            const v = viewer360;
+            if (!v.canvas) {
+                v.box = document.getElementById('view-360-container');
+                v.canvas = document.getElementById('canvas-360');
+                if (!v.box || !v.canvas) return;
+                v.ctx = v.canvas.getContext('2d');
+                bind360Events();
+            }
+            // Si aún no se cargó el 360 de la estación actual, se carga ahora.
+            if (v.status === 'empty' && !v.url && typeof currentStationIndex === 'number' && STATIONS[currentStationIndex]) {
+                loadPanoImage(STATIONS[currentStationIndex].pano360);
+            }
+            v.dirty = true;
+            render360();            // primer pintado inmediato (el contenedor ya es visible)
+            start360Loop();
+        }
+
+        function drawPano() { initViewers360(); }
 
         /* ==========================================================================
            5. GAME FLOW ENGINE
@@ -1192,7 +1433,7 @@
                 panoBox.classList.remove('hidden');
                 btnPano.className = "text-cafe border-b-2 border-caramelo font-bold pb-1 transition";
                 btnSlider.className = "text-caramelo/60 hover:text-cafe pb-1 transition";
-                drawPano();
+                initViewers360();
             }
         }
 
