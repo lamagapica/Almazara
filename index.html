@@ -712,13 +712,13 @@
             // ---- ESTACIÓN 2: TERMAS ----
             termasSliderRomano:   'termas romanas.png',    // ← slider "romano"
             termasSliderActual:   'termas actual.jpg',     // ← slider "actual"  (OJO: es .jpg, no .png)
-            termas360:            'Artesanos 360.jfif',        // ← visor 360°
+            termas360:            'Termas 360.jfif',           // ← visor 360° (si no existe, se prueba 'Artesanos 360.jfif' por compatibilidad)
 
             // ---- ESTACIÓN 3 (Calle Artesanos) y 4 (Campamento): AÚN SIN ARCHIVOS ----
             // Mientras estén vacíos se usan fotos de prueba de internet (fallback en STATIONS).
             artesanosSliderRomano: 'Artesanos romanos.jfif',
             artesanosSliderActual: 'Artesanos actual.jpg',
-            artesanos360:          'Artesanos actual.jpg',
+            artesanos360:          'Artesanos 360.jfif',
             campamentoSliderRomano: 'Campamento romano.jfif',
             campamentoSliderActual: 'Campamento actual.jpg',
             campamento360:          'Campamento 360.jfif'
@@ -729,17 +729,42 @@
 
         // Lista de candidatos para el 360°: prueba tu nombre exacto y, si no carga,
         // variantes de mayúsculas y extensión (.jfif/.jpg/.jpeg/.png/.webp), y al final la foto de prueba.
-        function pano360List(name, base, fallback) {
-            const exts = ['jfif', 'jpg', 'jpeg', 'png', 'webp', 'JPG', 'PNG'];
+        function pano360List(name, base, fallback, extras) {
+            const exts = ['jfif', 'jpg', 'jpeg', 'png', 'webp', 'JPG', 'PNG', 'JPEG', 'JFIF'];
             const out = [];
             if (name) out.push(name);
             [base, base.toLowerCase(), base.charAt(0).toUpperCase() + base.slice(1).toLowerCase()].forEach(b => {
                 exts.forEach(e => out.push(b + '.' + e));
             });
-            const uniq = [...new Set(out)].map(n => encodeURI(n));
-            if (fallback) uniq.push(fallback);
-            return uniq;
+            (extras || []).forEach(n => out.push(n));
+            const list = [...new Set(out)].map(n => encodeURI(n));
+            list.fallback = fallback || null;                       // foto de prueba (último recurso)
+            list.key = base.split(' ')[0];                          // palabra clave de la estación (para autodetección)
+            return list;
         }
+
+        // Autodetección: si ningún nombre candidato carga y la web está en GitHub Pages,
+        // se lee la lista de archivos del repositorio y se busca el que contenga
+        // la palabra de la estación + "360" (sin importar mayúsculas, tildes o extensión).
+        let _repoFilesPromise = null;
+        function getRepoFiles() {
+            if (_repoFilesPromise) return _repoFilesPromise;
+            _repoFilesPromise = (async () => {
+                try {
+                    const host = location.hostname;
+                    if (!/\.github\.io$/i.test(host)) return [];
+                    const owner = host.split('.')[0];
+                    const seg = location.pathname.split('/').filter(Boolean)[0];
+                    const repo = (seg && !/\.[a-z0-9]+$/i.test(seg)) ? seg : host;
+                    const r = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/');
+                    if (!r.ok) return [];
+                    const j = await r.json();
+                    return j.filter(f => f.type === 'file').map(f => f.name);
+                } catch (e) { return []; }
+            })();
+            return _repoFilesPromise;
+        }
+        const normName = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
         /* (Los dibujos detectores de cámara NO dependen de archivos: están incrustados
            dentro de este HTML en IMAGE_DETECTORS. Los PNG "Detector ..." del repositorio
@@ -804,7 +829,7 @@
                 // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
                 imgRoman:  imgPath(IMG.termasSliderRomano, 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80'),
                 imgActual: imgPath(IMG.termasSliderActual, 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80'),
-                pano360:   pano360List(IMG.termas360, 'Termas 360', 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1200&q=80')
+                pano360:   pano360List(IMG.termas360, 'Termas 360', 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1200&q=80', ['Artesanos 360.jfif'])
             },
             {
                 id: 'artesanos',
@@ -970,6 +995,8 @@
         function loadPanoImage(source) {
             const v = viewer360;
             const list = Array.isArray(source) ? source.filter(Boolean) : (source ? [source] : []);
+            const fallback = Array.isArray(source) ? source.fallback : null;
+            const key = Array.isArray(source) ? source.key : null;
             const url = list.length ? list.join('|') : null;   // clave única de esta estación
             if (url && url === v.url && (v.status === 'ready' || v.status === 'loading')) {
                 v.dirty = true;
@@ -980,6 +1007,7 @@
             v.src32 = null;
             v.out = null; v.out32 = null;
             v.mode = 'flat';
+            v.missing = key || '';
             v.yaw = 0; v.pitch = 0; v.fov = 80; v.lastInteraction = 0;
             v.dirty = true;
             if (!url) {
@@ -992,24 +1020,41 @@
             const token = url;
             const fail = () => {
                 if (v.url !== token) return;
+                console.warn('360: no se encontró ninguna imagen para «' + key + '». Revisa el nombre en const IMG.');
                 v.status = 'error';
                 v.dirty = true;
                 start360Loop();
             };
-            const tryIndex = (i, withCors) => {
+            // Prueba una lista de URLs en orden (primero con CORS, luego sin CORS); si ninguna carga, llama a next().
+            const tryList = (arr, i, withCors, next) => {
                 if (v.url !== token) return;
-                if (i >= list.length) { fail(); return; }
+                if (i >= arr.length) { next(); return; }
                 const img = new Image();
                 if (withCors) img.crossOrigin = 'anonymous';
                 img.onload = () => { if (v.url === token) prepare360Source(img); };
                 img.onerror = () => {
                     if (v.url !== token) return;
-                    if (withCors) { tryIndex(i, false); return; }   // reintento sin CORS (p. ej. abierto como archivo)
-                    tryIndex(i + 1, true);                          // siguiente nombre candidato
+                    if (withCors) { tryList(arr, i, false, next); return; }   // reintento sin CORS (p. ej. abierto como archivo)
+                    tryList(arr, i + 1, true, next);                          // siguiente nombre candidato
                 };
-                img.src = list[i];
+                img.src = arr[i];
             };
-            tryIndex(0, true);
+            tryList(list, 0, true, () => {
+                // 2.º intento: autodetectar el archivo en el repositorio de GitHub
+                getRepoFiles().then(files => {
+                    if (v.url !== token) return;
+                    const k = key ? normName(key) : '';
+                    const found = (files || [])
+                        .filter(f => /\.(jfif|jpe?g|png|webp)$/i.test(f))
+                        .filter(f => { const n = normName(f); return n.includes('360') && (!k || n.includes(k)); })
+                        .map(f => encodeURI(f))
+                        .filter(u => !list.includes(u));
+                    tryList(found, 0, true, () => {
+                        // 3.er intento: foto de prueba de internet
+                        if (fallback) tryList([fallback], 0, true, fail); else fail();
+                    });
+                });
+            });
         }
 
         function prepare360Source(img) {
@@ -1139,7 +1184,7 @@
             if (!v.canvas || !v.ctx || v.box.classList.contains('hidden')) return;
             if (!fit360()) return;
             if (v.status === 'loading') render360Message('Cargando vista 360°…');
-            else if (v.status === 'error') render360Message('No se pudo cargar la imagen 360°');
+            else if (v.status === 'error') render360Message('No se encontró la imagen 360° de ' + (v.missing || 'esta estación'));
             else if (v.status !== 'ready') render360Message('Sin imagen 360° para esta estación');
             else if (v.mode === 'sphere') render360Sphere();
             else render360Flat();
