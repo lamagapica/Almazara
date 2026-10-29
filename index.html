@@ -935,46 +935,48 @@
         /* ==========================================================================
            4. 360 PANORAMA CANVAS VIEWER
            ========================================================================== */
-       <!-- 2. VISOR 360º -->
-<div class="viewer-360">
-    <div id="pano-almazara" class="viewer-360-canvas" data-panorama="assets/360 Artesanos.png"></div>
-</div>
-
-<script>
-    let activeViewer360 = null;
-
-    function initViewers360() {
-        const container = document.getElementById('pano-almazara');
-        if (!container) return;
-
-        // Si ya existe una instancia previa, solo redimensionamos
-        if (activeViewer360) {
-            activeViewer360.resize();
-            return;
+        let panoImg = null, panoYaw = 0;
+        function loadPanoImage(url) {
+            panoImg = null;
+            if (!url) { drawPano(); return; }
+            const im = new Image();
+            im.onload = () => { panoImg = im; panoYaw = 0; drawPano(); };
+            im.onerror = () => { panoImg = null; drawPano(); };
+            im.src = url;
         }
-
-        const panoramaUrl = container.getAttribute('data-panorama');
-        
-        // Inicialización con Photo Sphere Viewer (o el motor 360 correspondiente)
-        try {
-            if (window.PhotoSphereViewer && window.PhotoSphereViewer.Viewer) {
-                activeViewer360 = new PhotoSphereViewer.Viewer({
-                    container: container,
-                    panorama: panoramaUrl,
-                    autorotateDelay: 2000,
-                    navbar: [
-                        'autorotate',
-                        'zoom',
-                        'move',
-                        'fullscreen'
-                    ]
-                });
+        function drawPano() {
+            const canvas = document.getElementById('canvas-360');
+            const box = document.getElementById('view-360-container');
+            if (!canvas || !box) return;
+            const w = box.clientWidth, h = box.clientHeight;
+            if (!w || !h) return;
+            const dpr = window.devicePixelRatio || 1;
+            if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+                canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
             }
-        } catch (e) {
-            console.log("Error al inicializar el visor 360:", e);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a1209'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (!panoImg) return;
+            const scale = canvas.height / panoImg.height;
+            const iw = panoImg.width * scale;
+            let x = -(((panoYaw % iw) + iw) % iw);
+            for (; x < canvas.width; x += iw) ctx.drawImage(panoImg, x, 0, iw, canvas.height);
         }
-    }
-</script>
+        (function setupPanoDrag() {
+            const box = document.getElementById('view-360-container');
+            if (!box) return;
+            let dragging = false, lastX = 0;
+            box.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; try { box.setPointerCapture(e.pointerId); } catch (_) {} });
+            box.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                panoYaw -= (e.clientX - lastX) * (window.devicePixelRatio || 1);
+                lastX = e.clientX; drawPano();
+            });
+            const end = () => { dragging = false; };
+            box.addEventListener('pointerup', end);
+            box.addEventListener('pointercancel', end);
+            window.addEventListener('resize', drawPano);
+        })();
 
         /* ==========================================================================
            5. GAME FLOW ENGINE
