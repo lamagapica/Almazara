@@ -712,13 +712,13 @@
             // ---- ESTACIÓN 2: TERMAS ----
             termasSliderRomano:   'termas romanas.png',    // ← slider "romano"
             termasSliderActual:   'termas actual.jpg',     // ← slider "actual"  (OJO: es .jpg, no .png)
-            termas360:            'termas 360.png',        // ← visor 360°
+            termas360:            'Artesanos 360.jfif',        // ← visor 360°
 
             // ---- ESTACIÓN 3 (Calle Artesanos) y 4 (Campamento): AÚN SIN ARCHIVOS ----
             // Mientras estén vacíos se usan fotos de prueba de internet (fallback en STATIONS).
             artesanosSliderRomano: 'Artesanos romanos.jfif',
             artesanosSliderActual: 'Artesanos actual.jpg',
-            artesanos360:          null,
+            artesanos360:          'Artesanos actual.jpg',
             campamentoSliderRomano: 'Campamento romano.jfif',
             campamentoSliderActual: 'Campamento actual.jpg',
             campamento360:          null
@@ -726,6 +726,20 @@
         // Si el nombre está vacío (null) se usa la foto de prueba; si no, se usa tu archivo.
         // encodeURI permite nombres con espacios ("almazara romana.png").
         const imgPath = (name, fallback) => name ? encodeURI(name) : fallback;
+
+        // Lista de candidatos para el 360°: prueba tu nombre exacto y, si no carga,
+        // variantes de mayúsculas y extensión (.jfif/.jpg/.jpeg/.png/.webp), y al final la foto de prueba.
+        function pano360List(name, base, fallback) {
+            const exts = ['jfif', 'jpg', 'jpeg', 'png', 'webp', 'JPG', 'PNG'];
+            const out = [];
+            if (name) out.push(name);
+            [base, base.toLowerCase(), base.charAt(0).toUpperCase() + base.slice(1).toLowerCase()].forEach(b => {
+                exts.forEach(e => out.push(b + '.' + e));
+            });
+            const uniq = [...new Set(out)].map(n => encodeURI(n));
+            if (fallback) uniq.push(fallback);
+            return uniq;
+        }
 
         /* (Los dibujos detectores de cámara NO dependen de archivos: están incrustados
            dentro de este HTML en IMAGE_DETECTORS. Los PNG "Detector ..." del repositorio
@@ -762,7 +776,7 @@
                 // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
                 imgRoman:  imgPath(IMG.almazaraSliderRomano, 'https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=800&q=80'),
                 imgActual: imgPath(IMG.almazaraSliderActual, 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'),
-                pano360:   imgPath(IMG.almazara360,          'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80')
+                pano360:   pano360List(IMG.almazara360, 'Almazara 360', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80')
             },
             {
                 id: 'termas',
@@ -790,7 +804,7 @@
                 // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
                 imgRoman:  imgPath(IMG.termasSliderRomano, 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80'),
                 imgActual: imgPath(IMG.termasSliderActual, 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80'),
-                pano360:   imgPath(IMG.termas360,          'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1200&q=80')
+                pano360:   pano360List(IMG.termas360, 'Termas 360', 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1200&q=80')
             },
             {
                 id: 'artesanos',
@@ -818,7 +832,7 @@
                 // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
                 imgRoman:  imgPath(IMG.artesanosSliderRomano, 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80'),
                 imgActual: imgPath(IMG.artesanosSliderActual, 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=800&q=80'),
-                pano360:   imgPath(IMG.artesanos360,          'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80')
+                pano360:   pano360List(IMG.artesanos360, 'Artesanos 360', 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80')
             },
             {
                 id: 'campamento',
@@ -846,7 +860,7 @@
                 // ▼ NOMBRES DE ARCHIVO: se cambian arriba, en el bloque "const IMG" ▼
                 imgRoman:  imgPath(IMG.campamentoSliderRomano, 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80'),
                 imgActual: imgPath(IMG.campamentoSliderActual, 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80'),
-                pano360:   imgPath(IMG.campamento360,          'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80')
+                pano360:   pano360List(IMG.campamento360, 'Campamento 360', 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80')
             }
         ];
 
@@ -953,15 +967,19 @@
         };
         const V360_MIN_FOV = 35, V360_MAX_FOV = 90, V360_BG = 0xFF121D2B; // #2b1d12 en ABGR
 
-        function loadPanoImage(url) {
+        function loadPanoImage(source) {
             const v = viewer360;
+            const list = Array.isArray(source) ? source.filter(Boolean) : (source ? [source] : []);
+            const url = list.length ? list.join('|') : null;   // clave única de esta estación
             if (url && url === v.url && (v.status === 'ready' || v.status === 'loading')) {
                 v.dirty = true;
                 return;
             }
-            v.url = url || null;
+            v.url = url;
             v.img = null;
             v.src32 = null;
+            v.out = null; v.out32 = null;
+            v.mode = 'flat';
             v.yaw = 0; v.pitch = 0; v.fov = 80; v.lastInteraction = 0;
             v.dirty = true;
             if (!url) {
@@ -972,20 +990,26 @@
             v.status = 'loading';
             start360Loop();
             const token = url;
-            const attempt = (withCors) => {
+            const fail = () => {
+                if (v.url !== token) return;
+                v.status = 'error';
+                v.dirty = true;
+                start360Loop();
+            };
+            const tryIndex = (i, withCors) => {
+                if (v.url !== token) return;
+                if (i >= list.length) { fail(); return; }
                 const img = new Image();
                 if (withCors) img.crossOrigin = 'anonymous';
                 img.onload = () => { if (v.url === token) prepare360Source(img); };
                 img.onerror = () => {
                     if (v.url !== token) return;
-                    if (withCors) { attempt(false); return; }  // reintento sin CORS (p. ej. abierto como archivo)
-                    v.status = 'error';
-                    v.dirty = true;
-                    start360Loop();
+                    if (withCors) { tryIndex(i, false); return; }   // reintento sin CORS (p. ej. abierto como archivo)
+                    tryIndex(i + 1, true);                          // siguiente nombre candidato
                 };
-                img.src = url;
+                img.src = list[i];
             };
-            attempt(true);
+            tryIndex(0, true);
         }
 
         function prepare360Source(img) {
