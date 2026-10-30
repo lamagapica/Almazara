@@ -1062,9 +1062,9 @@
             v.img = img;
             v.mode = 'flat';
             const ratio = img.naturalWidth / img.naturalHeight;
-            // Panorama equirectangular (≈2:1 o más ancho) → proyección esférica real.
+            // Panorama equirectangular (≈2:1, se acepta desde 1.7) → proyección esférica real.
             // Foto normal → desplazamiento horizontal en bucle.
-            if (ratio >= 1.9) {
+            if (ratio >= 1.7) {
                 try {
                     const sw = Math.min(img.naturalWidth, 2048);
                     const sh = Math.max(2, Math.round(sw / ratio));
